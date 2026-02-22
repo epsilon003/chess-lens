@@ -1,0 +1,62 @@
+/* src/pages/GamesPage.css */
+.games-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--text-1);
+}
+
+.search-input {
+  margin-bottom: 24px; max-width: 400px;
+}
+
+.empty-state {
+  text-align: center; padding: 80px 20px;
+  color: var(--text-2);
+}
+.empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.game-card {
+  text-decoration: none; display: flex; flex-direction: column; gap: 8px;
+  transition: all 0.2s; cursor: pointer;
+  border-top: 3px solid var(--border);
+}
+.game-card:hover { border-top-color: var(--red); transform: translateY(-2px); }
+
+.game-card-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.game-title {
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  color: var(--text-1); flex: 1; margin-right: 8px;
+}
+.delete-btn {
+  background: none; border: none; color: var(--text-3);
+  cursor: pointer; font-size: 13px; padding: 2px 6px;
+  border-radius: 4px; transition: all 0.15s; flex-shrink: 0;
+}
+.delete-btn:hover { color: var(--red); background: var(--red-glow); }
+
+.game-notes {
+  font-size: 12px; color: var(--text-2); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.game-meta {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--text-3); margin-top: 4px;
+}
+
+.game-fen-preview {
+  font-size: 10px; color: var(--text-3); letter-spacing: 0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding-top: 8px; border-top: 1px solid var(--border);
+}

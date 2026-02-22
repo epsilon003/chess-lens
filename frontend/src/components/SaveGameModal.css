@@ -1,0 +1,38 @@
+/* src/components/SaveGameModal.css */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(26,22,18,0.6); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: 16px;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+.modal-box {
+  width: 100%; max-width: 440px;
+  animation: slideUp 0.2s ease;
+  background: var(--bg-0);
+  border-top: 3px solid var(--red);
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0 }
+  to   { transform: translateY(0);    opacity: 1 }
+}
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-close {
+  background: none; border: none; color: var(--text-3);
+  font-size: 16px; cursor: pointer; padding: 4px 8px;
+  border-radius: 4px;
+}
+.modal-close:hover { color: var(--text-1); background: var(--bg-2); }
+
+.modal-form { display: flex; flex-direction: column; gap: 16px; }
+.modal-form textarea { resize: vertical; }
+
+.modal-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+}

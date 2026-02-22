@@ -1,0 +1,172 @@
+/* src/index.css */
+/* -- Design System: Newspaper / Editorial -------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg-0:       #f5f0e8;
+  --bg-1:       #ede8df;
+  --bg-2:       #e4ddd2;
+  --bg-3:       #d8d0c4;
+  --border:     #c4bdb0;
+  --border-hi:  #a8a096;
+
+  --red:        #c0392b;
+  --red-dim:    #922b21;
+  --red-glow:   rgba(192,57,43,0.12);
+
+  --text-1:     #1a1612;
+  --text-2:     #4a4440;
+  --text-3:     #8a8278;
+
+  --green:      #2e7d52;
+  --blue:       #1a5276;
+  --warn:       #b7770d;
+
+  --board-light: #f0d9b5;
+  --board-dark:  #b58863;
+
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-mono);
+  background:  var(--bg-0);
+  color:       var(--text-1);
+  min-height:  100vh;
+  line-height: 1.6;
+  font-size:   14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle paper texture overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.5;
+}
+
+/* -- Scrollbar ---------------------------------------------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-1); }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+/* -- Loading screen ----------------------------------------- */
+.loading-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; background: var(--bg-0);
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* -- Buttons ------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+  letter-spacing: 0.03em;
+}
+.btn-primary {
+  background: var(--red); color: #f5f0e8;
+}
+.btn-primary:hover { background: var(--red-dim); transform: translateY(-1px); box-shadow: 0 4px 20px var(--red-glow); }
+
+.btn-ghost {
+  background: transparent; color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--red); color: var(--red); }
+
+.btn-danger {
+  background: transparent; color: var(--red);
+  border: 1px solid rgba(192,57,43,0.3);
+}
+.btn-danger:hover { background: var(--red-glow); }
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+/* -- Cards --------------------------------------------------- */
+.card {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 12px;
+}
+
+/* -- Form elements ------------------------------------------- */
+input, textarea, select {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 10px 14px;
+  width: 100%;
+  transition: border-color 0.2s;
+  outline: none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+label {
+  display: block; font-size: 11px; font-weight: 500;
+  color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+/* -- Page wrapper -------------------------------------------- */
+.page {
+  max-width: 1200px; margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* -- Utility ------------------------------------------------- */
+.text-gold  { color: var(--red); }
+.text-muted { color: var(--text-3); }
+.text-green { color: var(--green); }
+.text-red   { color: var(--red); }
+.gap-8  { gap: 8px; }
+.gap-12 { gap: 12px; }
+.flex   { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.w-full { width: 100%; }
+.mt-8  { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+
+/* -- Animations ---------------------------------------------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+.fade-up-delay-1 { animation-delay: 0.1s; opacity: 0; }
+.fade-up-delay-2 { animation-delay: 0.2s; opacity: 0; }
+.fade-up-delay-3 { animation-delay: 0.3s; opacity: 0; }
