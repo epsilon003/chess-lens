@@ -4,13 +4,13 @@ import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB3hZwjJ-rit-9EHF8uar7oLKMQ-x_JREQ",
-  authDomain: "chess-lens-8eb7a.firebaseapp.com",
-  projectId: "chess-lens-8eb7a",
-  storageBucket: "chess-lens-8eb7a.firebasestorage.app",
-  messagingSenderId: "422679029109",
-  appId: "1:422679029109:web:324c80809c599a34b89f3c"
-};
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+}
 
 const app = initializeApp(firebaseConfig)
 

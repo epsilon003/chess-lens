@@ -1,11 +1,11 @@
 # ♛ ChessLens — AI Chess Analysis Web App
 
 A full-stack chess analysis application:
-- 📷 **Image recognition**: upload a photo of any physical board → auto-detect position
-- ⚡ **Stockfish 16 WASM**: instant in-browser engine analysis (no server round-trip)
-- 💾 **Game library**: save, browse, and replay games
-- 🔐 **Google Auth**: sign in with Google via Firebase
-- 📱 **Responsive**: works on phone and desktop
+- **Image recognition**: upload a photo of any physical board → auto-detect position
+- **Stockfish 16 WASM**: instant in-browser engine analysis (no server round-trip)
+- **Game library**: save, browse, and replay games
+- **Google Auth**: sign in with Google via Firebase
+- **Responsive**: works on phone and desktop
 
 All free services. No paid APIs.
 
@@ -212,7 +212,3 @@ users/
 ```
 
 ---
-
-## License
-
-MIT — free for personal and academic use.
