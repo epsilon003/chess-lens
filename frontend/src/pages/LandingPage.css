@@ -78,7 +78,8 @@
 }
 .hero-btn {
   padding: 14px 36px; font-size: 14px;
-  width: 100%; max-width: 280px;
+  width: 100%; max-width: 180px;
+  margin: 0 auto;
 }
 
 .hero-note {
