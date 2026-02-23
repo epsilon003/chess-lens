@@ -1,15 +1,15 @@
 /* src/pages/LandingPage.css */
 .landing { overflow-x: hidden; }
 
-/* Hero */
 .hero {
-  position: relative; min-height: calc(100vh - 60px);
+  position: relative;
+  min-height: calc(100vh - 56px);
   display: flex; align-items: center; justify-content: center;
-  overflow: hidden; padding: 60px 24px;
+  overflow: hidden;
+  padding: 40px 20px;
   background: var(--text-1);
 }
 
-/* Chessboard bg — visible on dark hero */
 .hero-board-bg {
   position: absolute; inset: 0;
   display: grid; grid-template-columns: repeat(8, 1fr);
@@ -22,57 +22,70 @@
 .sq-dark  { background: #b58863; }
 
 .hero-content {
-  position: relative; text-align: center; max-width: 640px;
+  position: relative; text-align: center; max-width: 640px; width: 100%;
 }
 
 .hero-badge {
   display: inline-block;
   background: rgba(192,57,43,0.2); border: 1px solid rgba(192,57,43,0.4);
-  color: #e07060; padding: 6px 16px; border-radius: 20px;
-  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-  margin-bottom: 24px;
+  color: #e07060; padding: 5px 14px; border-radius: 20px;
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
 }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(40px, 8vw, 80px);
+  font-size: clamp(36px, 10vw, 80px);
   font-weight: 900; line-height: 1.05;
-  letter-spacing: -0.03em; margin-bottom: 20px;
+  letter-spacing: -0.03em; margin-bottom: 16px;
   color: var(--bg-0);
 }
 .hero-title .text-gold { color: var(--red); }
 
 .hero-sub {
-  font-size: 16px; color: #a09a90; max-width: 480px;
-  margin: 0 auto 32px; line-height: 1.7;
+  font-family: var(--font-display);
+  font-size: clamp(14px, 3.5vw, 17px);
+  font-style: italic;
+  color: #a09a90; max-width: 480px;
+  margin: 0 auto 28px; line-height: 1.7;
 }
 
 .hero-actions {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-.hero-btn { padding: 14px 32px; font-size: 15px; }
+.hero-btn {
+  padding: 14px 36px; font-size: 14px;
+  width: 100%; max-width: 280px;
+}
 
 .hero-note {
-  font-size: 12px; color: #5a5450; letter-spacing: 0.04em;
+  font-size: 11px; color: #5a5450; letter-spacing: 0.04em;
 }
 
-/* Features — light background */
+/* Features */
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px; padding: 60px 24px; max-width: 1100px; margin: 0 auto;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 40px 16px 60px;
+  max-width: 1100px; margin: 0 auto;
+}
+@media (min-width: 500px) {
+  .features { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .features { grid-template-columns: repeat(4, 1fr); padding: 60px 24px; }
 }
 
-/* Thick top border rule on feature cards — editorial touch */
 .feature-card {
   transition: transform 0.2s, border-color 0.2s;
   border-top: 3px solid var(--text-1);
 }
 .feature-card:hover { transform: translateY(-3px); border-top-color: var(--red); }
 
-.feature-icon { font-size: 28px; margin-bottom: 12px; }
 .feature-title {
-  font-family: var(--font-display); font-size: 16px; font-weight: 700;
-  margin-bottom: 8px; color: var(--text-1);
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  margin-bottom: 6px; color: var(--text-1);
 }
-.feature-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+.feature-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; }

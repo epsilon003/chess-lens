@@ -104,7 +104,7 @@ export default function AnalyzePage() {
         <div className="header-actions">
           {saveStatus === 'saved' && <span className="text-green">✓ Saved!</span>}
           <button onClick={() => setSaveModal(true)} className="btn btn-ghost">
-            💾 Save Game
+            Save Game
           </button>
           <button onClick={reset} className="btn btn-ghost">
             ↺ Reset
@@ -115,9 +115,9 @@ export default function AnalyzePage() {
       {/* Input mode tabs */}
       <div className="mode-tabs">
         {[
-          { key: 'board', label: '♟ Interactive Board' },
-          { key: 'image', label: '📷 Upload Photo' },
-          { key: 'fen',   label: '# FEN String' },
+          { key: 'board', label: 'Interactive Board' },
+          { key: 'image', label: 'Upload Photo' },
+          { key: 'fen',   label: 'FEN String' },
         ].map(({ key, label }) => (
           <button
             key={key}

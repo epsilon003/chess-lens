@@ -1,7 +1,7 @@
 /* src/components/Navbar.css */
 .navbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px; height: 60px;
+  padding: 0 16px; height: 56px;
   background: var(--text-1);
   border-bottom: 3px solid var(--red);
   position: sticky; top: 0; z-index: 100;
@@ -9,46 +9,72 @@
 
 .navbar-logo {
   font-family: var(--font-display);
-  font-size: 22px; font-weight: 900;
+  font-size: 20px; font-weight: 900;
   color: var(--bg-0); text-decoration: none;
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 6px;
   letter-spacing: -0.02em;
+  flex-shrink: 0;
 }
 .navbar-logo span { color: var(--red); }
 
+/* Hide nav links on mobile — they're accessible via the pages anyway */
 .navbar-links {
-  display: flex; gap: 4px;
+  display: none;
 }
+@media (min-width: 640px) {
+  .navbar-links {
+    display: flex; gap: 4px;
+  }
+}
+
 .nav-link {
-  padding: 6px 14px; border-radius: var(--radius-sm);
+  padding: 6px 12px; border-radius: var(--radius-sm);
   color: #a09a90; text-decoration: none;
   font-size: 13px; font-weight: 500; letter-spacing: 0.03em;
-  transition: all 0.15s;
+  transition: all 0.15s; white-space: nowrap;
 }
 .nav-link:hover { color: var(--bg-0); background: rgba(255,255,255,0.08); }
 .nav-link.active { color: var(--red); }
 
-.navbar-auth { display: flex; align-items: center; }
+.navbar-auth { display: flex; align-items: center; flex-shrink: 0; }
 
 .user-info {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 8px;
 }
 .avatar {
   width: 28px; height: 28px; border-radius: 50%;
   border: 2px solid var(--red-dim);
+  flex-shrink: 0;
 }
-.user-name {
-  font-size: 13px; color: #a09a90;
-  display: none;
-}
-.btn-sm { padding: 6px 12px; font-size: 12px; }
 
-/* Override ghost button for dark navbar */
+/* On mobile: show avatar + sign out only, hide name */
+.user-name { display: none; }
+
+@media (min-width: 640px) {
+  .user-name {
+    display: block;
+    font-size: 13px; color: #a09a90;
+  }
+}
+
+.btn-sm { padding: 6px 10px; font-size: 12px; white-space: nowrap; }
+
 .navbar .btn-ghost {
   color: #a09a90; border-color: #3a3530;
 }
 .navbar .btn-ghost:hover { border-color: var(--red); color: var(--red); }
 
-@media (min-width: 600px) {
-  .user-name { display: block; }
+/* Mobile: also show nav links below navbar as a sub-bar when logged in */
+.mobile-nav {
+  display: flex;
+  background: #111;
+  border-bottom: 1px solid #2a2520;
+  padding: 0 8px;
+}
+.mobile-nav .nav-link {
+  flex: 1; text-align: center; padding: 10px 8px;
+  font-size: 12px; border-radius: 0;
+}
+@media (min-width: 640px) {
+  .mobile-nav { display: none; }
 }

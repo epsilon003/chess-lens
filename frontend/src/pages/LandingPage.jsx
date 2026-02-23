@@ -49,22 +49,18 @@ export default function LandingPage() {
       {/* Features */}
       <section className="features fade-up fade-up-delay-1">
         <Feature
-          icon="📸"
           title="Photo Recognition"
           desc="Snap a photo of any physical board or screenshot. Our vision engine extracts the position automatically."
         />
         <Feature
-          icon="⚡"
           title="Stockfish Engine"
           desc="Analysis runs directly in your browser using Stockfish 16 WASM — no server round-trips, instant results."
         />
         <Feature
-          icon="💾"
           title="Game Library"
           desc="Save positions and full games to your personal library. Revisit, annotate, and track your progress."
         />
         <Feature
-          icon="📱"
           title="Works Everywhere"
           desc="Fully responsive on phone, tablet, and desktop. Analyze on the couch after your OTB game."
         />
@@ -73,10 +69,9 @@ export default function LandingPage() {
   )
 }
 
-function Feature({ icon, title, desc }) {
+function Feature({ title, desc }) {
   return (
     <div className="feature-card card">
-      <div className="feature-icon">{icon}</div>
       <h3 className="feature-title">{title}</h3>
       <p className="feature-desc">{desc}</p>
     </div>
