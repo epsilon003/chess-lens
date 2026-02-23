@@ -1,10 +1,54 @@
 /* src/components/Navbar.css */
 .navbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; height: 56px;
+  padding: 0 20px; height: 56px;
   background: var(--text-1);
   border-bottom: 3px solid var(--red);
   position: sticky; top: 0; z-index: 100;
+}
+
+[data-theme="dark"] .navbar {
+  background: #0a0a0b;
+  border-bottom-color: #5b8dd9;
+}
+
+[data-theme="dark"] .mobile-nav {
+  background: #0a0a0b;
+  border-bottom-color: #1a1a1f;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 48px; height: 26px;
+  border-radius: 13px;
+  border: none; cursor: pointer;
+  background: #3a3530;
+  transition: background 0.3s;
+  flex-shrink: 0;
+  padding: 0;
+  margin-right: 4px;
+}
+
+[data-theme="dark"] .theme-toggle-switch {
+  background: #5b8dd9;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #f5f0e8;
+  display: flex; align-items: center; justify-content: center;
+  color: #c9a84c;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] .toggle-thumb {
+  transform: translateX(22px);
+  color: #1a1a2e;
+  background: #f0ede8;
 }
 
 .navbar-logo {
@@ -16,6 +60,26 @@
   flex-shrink: 0;
 }
 .navbar-logo span { color: var(--red); }
+.navbar-logo {
+  color: #f5f0e8;
+}
+
+.navbar-logo span {
+  color: var(--red);
+}
+
+[data-theme="dark"] .navbar {
+  background: #0a0a0b;
+  border-bottom-color: var(--red);
+}
+
+[data-theme="dark"] .navbar-logo {
+  color: #f5f0e8;
+}
+
+[data-theme="dark"] .navbar-logo span {
+  color: var(--red);
+}
 
 /* Hide nav links on mobile — they're accessible via the pages anyway */
 .navbar-links {
@@ -36,7 +100,7 @@
 .nav-link:hover { color: var(--bg-0); background: rgba(255,255,255,0.08); }
 .nav-link.active { color: var(--red); }
 
-.navbar-auth { display: flex; align-items: center; flex-shrink: 0; }
+.navbar-auth { display: flex; align-items: center; flex-shrink: 0; gap: 12px; }
 
 .user-info {
   display: flex; align-items: center; gap: 8px;
