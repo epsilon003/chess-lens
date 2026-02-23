@@ -10,6 +10,28 @@
   background: var(--text-1);
 }
 
+[data-theme="dark"] .hero {
+  background: #0f0f12;
+}
+
+[data-theme="dark"] .hero-title {
+  color: #f0ede8;
+}
+
+[data-theme="dark"] .hero-sub {
+  color: #6a6460;
+}
+
+[data-theme="dark"] .hero-badge {
+  background: rgba(91,141,217,0.2);
+  border-color: rgba(91,141,217,0.4);
+  color: #7aabf0;
+}
+
+[data-theme="dark"] .hero-note {
+  color: #4a4440;
+}
+
 .hero-board-bg {
   position: absolute; inset: 0;
   display: grid; grid-template-columns: repeat(8, 1fr);
