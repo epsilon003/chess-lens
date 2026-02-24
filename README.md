@@ -13,7 +13,7 @@ All free services. No paid APIs.
 
 ## Architecture
 
-![Architecture](assets/Architecture.png)
+![Architecture](assets/Architecture.PNG)
 
 ---
 
