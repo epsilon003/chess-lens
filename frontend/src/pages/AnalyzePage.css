@@ -43,7 +43,11 @@
   .analyze-grid { grid-template-columns: minmax(300px, 520px) 1fr; }
 }
 
-.board-wrap { width: 100%; max-width: 520px; margin: 0 auto; }
+.board-wrap { 
+  width: 100%; 
+  max-width: 520px; 
+  margin: 0 auto;
+}
 
 .board-controls {
   display: flex; align-items: center; justify-content: space-between;
