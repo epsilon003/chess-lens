@@ -50,20 +50,24 @@ chess-analyzer/
 
 ---
 
-## Firestore Data Model
+## Firestore Database Schema
 
 ```
-users/
-  {uid}/
-    games/
-      {gameId}:
-        title:     string
-        notes:     string
-        fen:       string        ← position FEN
-        pgn:       string        ← full game PGN
-        moves:     string[]      ← move history in SAN
-        createdAt: Timestamp
-        updatedAt: Timestamp
+Firestore
+│
+└── users/                          ← top-level collection
+    └── {uid}/                      ← one document per Google user
+        │    (uid = Firebase Auth user ID)
+        │
+        └── games/                  ← subcollection inside each user
+            └── {gameId}/           ← auto-generated document ID
+                  title:     string
+                  notes:     string
+                  fen:       string   ← board position at save time
+                  pgn:       string   ← full game in PGN format
+                  moves:     array    ← ["e4", "e5", "Nf3", ...]
+                  createdAt: timestamp
+                  updatedAt: timestamp
 ```
 
 ---
