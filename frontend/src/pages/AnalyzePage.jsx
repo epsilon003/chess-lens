@@ -24,7 +24,49 @@ export default function AnalyzePage() {
   const [saveStatus, setSaveStatus] = useState('')
   const [boardOrientation, setBoardOrientation] = useState('white')
   const [moveHistory, setMoveHistory]  = useState([])
+  const [selectedSquare,  setSelectedSquare]  = useState(null)
+  const [highlightSquares, setHighlightSquares] = useState({})
 
+  const onSquareClick = (square) => {
+  // If a piece is already selected, try to move to clicked square
+  if (selectedSquare) {
+    const moved = onDrop(selectedSquare, square)
+    if (moved) {
+      setSelectedSquare(null)
+      setHighlightSquares({})
+      return
+    }
+  }
+
+  // Select the clicked square and show its legal moves
+  const moves = chess.moves({ square, verbose: true })
+
+  if (moves.length === 0) {
+    setSelectedSquare(null)
+    setHighlightSquares({})
+    return
+  }
+
+  setSelectedSquare(square)
+
+  const highlights = {}
+
+  // Highlight the selected piece square
+  highlights[square] = { background: 'rgba(192, 57, 43, 0.4)' }
+
+  // Highlight each legal destination
+  moves.forEach(move => {
+    const isCapture = chess.get(move.to)
+    highlights[move.to] = {
+      background: isCapture
+        ? 'radial-gradient(circle, rgba(192,57,43,0.5) 60%, transparent 65%)'
+        : 'radial-gradient(circle, rgba(192,57,43,0.35) 25%, transparent 30%)',
+      borderRadius: '50%',
+    }
+  })
+
+  setHighlightSquares(highlights)
+  }
   // ── Update position + trigger analysis ───────────────────────
   const loadFen = useCallback((newFen) => {
     try {
@@ -40,6 +82,8 @@ export default function AnalyzePage() {
 
   // ── Board move handler ────────────────────────────────────────
   const onDrop = (sourceSquare, targetSquare) => {
+    setSelectedSquare(null)
+    setHighlightSquares({})
     try {
       const move = chess.move({
         from: sourceSquare,
@@ -146,6 +190,8 @@ export default function AnalyzePage() {
               customBoardStyle={{ borderRadius: '8px', boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }}
               customDarkSquareStyle={{ backgroundColor: '#b58863' }}
               customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
+              onSquareClick={onSquareClick}
+              customSquareStyles={highlightSquares}
             />
           </div>
 
