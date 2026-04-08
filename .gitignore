@@ -5,5 +5,5 @@ dist/
 __pycache__/
 *.pyc
 .DS_Store
-dataset/
+archive/
 vision-service/venv/
