@@ -49,7 +49,7 @@ chess-analyzer/
 ---
 ## Recognition Model
 
-A computer vision model that detects chess pieces from board images and outputs FEN strings.
+Detects chess pieces from board images and outputs FEN strings.
 
 ### Model Characteristics
 
