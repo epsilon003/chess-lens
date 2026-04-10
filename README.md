@@ -34,9 +34,7 @@ chess-analyzer/
 ├── firestore.rules      # Security rules
 └── firebase.json        # Firebase Hosting config
 ```
-
-
-
+---
 ## Key Tech Decisions
 
 | Choice | Reason |
@@ -49,7 +47,55 @@ chess-analyzer/
 | Render.com | Free hobby tier for always-on Node/Python services |
 
 ---
+## Recognition Model
 
+A computer vision model that detects chess pieces from board images and outputs FEN strings.
+
+### Model Characteristics
+
+| Property | Value |
+|----------|-------|
+| Architecture | MobileNetV3-Small |
+| Input | 64×64 RGB cell image |
+| Output | 13-class prediction (K Q R B N P k q r b n p .) |
+| Parameters | ~1.5M |
+| Weights file | `model_weights.pth` |
+
+### Dataset
+
+| Property | Value |
+|----------|-------|
+| Dataset | [ChessRender360](https://www.kaggle.com/datasets/mmkoya/chessrender360) |
+| Total images | 10,000 rendered chess positions |
+| Image size | 2000×2000 RGB |
+| Cell samples | 640,000 (64 per image) |
+| Train / Val split | 80% / 20% |
+
+### Training
+
+| Property | Value |
+|----------|-------|
+| Epochs | 10 (fine-tuned from 30-epoch checkpoint) |
+| Batch size | 128 |
+| Learning rate | 3e-3 |
+| Optimizer | Adam |
+| Scheduler | StepLR (step=10, gamma=0.5) |
+| Device | Tesla T4 GPU |
+
+### Inference Pipeline
+
+1. Photo is taken from phone browser and sent to Flask server
+2. `find_board()` detects and perspective-warps the board to 512×512
+3. Board is sliced into 64 cells (one per square)
+4. MobileNetV3 classifies each cell into one of 13 classes
+5. Predictions are assembled into a valid FEN string
+
+### Output Format
+
+```
+recognize_board(image_bytes) → {{'fen': 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', 'confidence': 0.87}}
+```
+---
 ## Firestore Database Schema
 
 ```
@@ -71,3 +117,18 @@ Firestore
 ```
 
 ---
+## How to Run on your Local Machine
+
+1. Run
+   ```
+   git clone https://github.com/epsilon003/chess-lens.git
+   ```
+2. Open the folder in your IDE and navigate to the "frontend" sub-folder
+   ```
+   cd frontend
+   ```
+3. Finally run
+   ```
+   npm install
+   npm run dev
+   ```
