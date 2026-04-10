@@ -9,6 +9,7 @@ import { useAuth }          from '../hooks/useAuth'
 import ImageUpload          from '../components/ImageUpload'
 import AnalysisPanel        from '../components/AnalysisPanel'
 import SaveGameModal        from '../components/SaveGameModal'
+import PgnImportModal       from '../components/PgnImportModal'
 import EvalGraph            from '../components/EvalGraph'
 import { saveGame }         from '../services/gamesService'
 import './AnalyzePage.css'
@@ -27,6 +28,7 @@ export default function AnalyzePage() {
   const [saveModal, setSaveModal]   = useState(false)
   const [saveStatus,setSaveStatus]  = useState('')
   const [copied,    setCopied]      = useState(false)
+  const [pgnModal,  setPgnModal]    = useState(false)
   const [boardOrientation, setBoardOrientation] = useState('white')
   const [moveHistory, setMoveHistory] = useState([])
   const [selectedSquare,   setSelectedSquare]   = useState(null)
@@ -215,6 +217,11 @@ export default function AnalyzePage() {
 
   // ── Save ──────────────────────────────────────────────────
   const handleSave = async ({ title, notes }) => {
+    if (!user) {
+      setSaveStatus('error')
+      setErrorMsg('You must be signed in to save games.')
+      return
+    }
     try {
       setSaveStatus('saving')
       await saveGame(user.uid, {
@@ -225,8 +232,33 @@ export default function AnalyzePage() {
       setSaveStatus('saved')
       setSaveModal(false)
       setTimeout(() => setSaveStatus(''), 2000)
-    } catch {
+    } catch (err) {
+      console.error('Save failed:', err)
       setSaveStatus('error')
+      setErrorMsg('Save failed: ' + (err?.message || 'unknown error'))
+    }
+  }
+
+  // ── PGN Import ────────────────────────────────────────────
+  const handlePgnImport = ({ pgn, lastFen, history }) => {
+    try {
+      chess.loadPgn(pgn)
+      const nodes = []
+      const tempChess = new Chess()
+      history.forEach((san, i) => {
+        tempChess.move(san)
+        nodes.push({ fen: tempChess.fen(), san, uci: san, parentIdx: i - 1 })
+      })
+      setTreeNodes(nodes)
+      setCurrentNode(nodes.length - 1)
+      chess.loadPgn(pgn)
+      setFen(lastFen)
+      setMoveHistory(chess.history({ verbose: true }))
+      sf.resetEvalHistory()
+      sf.analyse(lastFen)
+      setSearchParams({ fen: lastFen })
+    } catch {
+      console.error("PGN import failed")
     }
   }
 
@@ -253,6 +285,7 @@ export default function AnalyzePage() {
           <button onClick={sharePosition} className="btn btn-ghost">
             {copied ? 'Copied!' : 'Share'}
           </button>
+          <button onClick={() => setPgnModal(true)} className="btn btn-ghost">Import PGN</button>
           <button onClick={() => setSaveModal(true)} className="btn btn-ghost">Save Game</button>
           <button onClick={reset} className="btn btn-ghost">Reset</button>
         </div>
@@ -406,6 +439,12 @@ export default function AnalyzePage() {
         </div>
       </div>
 
+      {pgnModal && (
+        <PgnImportModal
+          onImport={handlePgnImport}
+          onClose={() => setPgnModal(false)}
+        />
+      )}
       {saveModal && (
         <SaveGameModal
           onSave={handleSave}

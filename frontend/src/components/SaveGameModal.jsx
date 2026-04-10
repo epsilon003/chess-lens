@@ -44,7 +44,7 @@ export default function SaveGameModal({ onSave, onClose, isSaving }) {
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn btn-ghost">Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={isSaving}>
-              {isSaving ? 'Saving…' : '💾 Save Game'}
+              {isSaving ? 'Saving…' : 'Save Game'}
             </button>
           </div>
         </form>
