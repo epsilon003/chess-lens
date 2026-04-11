@@ -1,0 +1,138 @@
+/* src/pages/PatternsPage.css */
+.patterns-page { max-width: 900px; }
+
+.patterns-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--text-1);
+}
+.patterns-subtitle {
+  font-size: 13px; color: var(--text-2);
+  margin-top: 6px; max-width: 560px; line-height: 1.6;
+}
+
+.patterns-loading {
+  display: flex; justify-content: center; padding: 60px;
+}
+
+.patterns-empty {
+  text-align: center; padding: 60px 20px;
+  font-size: 14px; color: var(--text-2);
+}
+
+/* Controls card */
+.patterns-controls { margin-bottom: 0; }
+.patterns-controls-row {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+
+.color-toggle {
+  display: flex; gap: 4px; margin-top: 6px;
+}
+.color-btn {
+  padding: 6px 16px; border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--text-2);
+  font-family: var(--font-mono); font-size: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.color-btn:hover  { border-color: var(--text-2); color: var(--text-1); }
+.color-btn.active { background: var(--text-1); color: var(--bg-0); border-color: var(--text-1); }
+
+.games-summary {
+  display: flex; flex-direction: column; align-items: center;
+  font-size: 12px;
+}
+.games-count {
+  font-family: var(--font-display); font-size: 32px;
+  font-weight: 900; color: var(--text-1); line-height: 1;
+}
+
+/* Progress */
+.analysis-progress { margin-top: 16px; }
+.progress-label {
+  font-size: 12px; color: var(--text-2); margin-bottom: 8px;
+}
+.progress-bar {
+  height: 4px; background: var(--bg-3);
+  border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--red);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Results */
+.patterns-results { margin-top: 24px; }
+.patterns-results-header {
+  margin-bottom: 16px;
+}
+.results-meta {
+  font-size: 13px; color: var(--text-2);
+}
+
+.patterns-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .patterns-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Pattern card */
+.pattern-card {
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  transition: transform 0.15s;
+}
+.pattern-card:hover { transform: translateY(-2px); }
+
+.pattern-card-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px;
+  margin-bottom: 10px;
+}
+.pattern-title {
+  font-family: var(--font-display); font-size: 15px;
+  font-weight: 700; color: var(--text-1);
+}
+.pattern-badge {
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.06em; font-weight: 600;
+  border: 1px solid; border-radius: 4px;
+  padding: 2px 7px; white-space: nowrap; flex-shrink: 0;
+}
+
+/* Rate bar */
+.pattern-bar-wrap {
+  height: 3px; background: var(--bg-3);
+  border-radius: 2px; overflow: hidden;
+  margin-bottom: 10px;
+}
+.pattern-bar-fill {
+  height: 100%; border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.pattern-detail {
+  font-size: 12px; color: var(--text-2);
+  line-height: 1.6; margin-bottom: 10px;
+}
+
+.pattern-advice {
+  font-size: 12px; color: var(--text-2);
+  background: var(--bg-0);
+  border-radius: 6px; padding: 8px 10px;
+  line-height: 1.6;
+}
+.pattern-advice-label {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-3); margin-right: 6px;
+}

@@ -1,57 +1,52 @@
 // src/services/gamesService.js
-// All Firestore operations for saving/loading games
-
 import {
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  serverTimestamp,
+  collection, addDoc, getDocs, getDoc,
+  doc, updateDoc, deleteDoc,
+  serverTimestamp, orderBy, query,
 } from 'firebase/firestore'
 import { db } from '../firebase'
 
-// ── Helpers ───────────────────────────────────────────────────
-const gamesRef = (uid) => collection(db, 'users', uid, 'games')
-
-// ── Save a new game ───────────────────────────────────────────
-export async function saveGame(uid, gameData) {
-  // gameData: { title, fen, pgn, moves[], imageUrl, notes }
-  const ref = await addDoc(gamesRef(uid), {
-    ...gameData,
+export async function saveGame(uid, { title, white, black, notes, fen, pgn, moves }) {
+  if (!uid) throw new Error('User not authenticated')
+  const ref = collection(db, 'users', uid, 'games')
+  const docRef = await addDoc(ref, {
+    title:     title || 'Untitled',
+    white:     white || '',
+    black:     black || '',
+    notes:     notes || '',
+    fen:       fen   || '',
+    pgn:       pgn   || '',
+    moves:     moves || [],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
-  return ref.id
+  return docRef.id
 }
 
-// ── Load all games for a user ─────────────────────────────────
 export async function loadGames(uid) {
-  const q    = query(gamesRef(uid), orderBy('createdAt', 'desc'))
+  if (!uid) throw new Error('User not authenticated')
+  const ref = collection(db, 'users', uid, 'games')
+  const q   = query(ref, orderBy('createdAt', 'desc'))
   const snap = await getDocs(q)
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
 }
 
-// ── Load a single game ────────────────────────────────────────
 export async function loadGame(uid, gameId) {
+  if (!uid) throw new Error('User not authenticated')
   const ref  = doc(db, 'users', uid, 'games', gameId)
   const snap = await getDoc(ref)
   if (!snap.exists()) throw new Error('Game not found')
   return { id: snap.id, ...snap.data() }
 }
 
-// ── Update a game ─────────────────────────────────────────────
 export async function updateGame(uid, gameId, updates) {
+  if (!uid) throw new Error('User not authenticated')
   const ref = doc(db, 'users', uid, 'games', gameId)
   await updateDoc(ref, { ...updates, updatedAt: serverTimestamp() })
 }
 
-// ── Delete a game ─────────────────────────────────────────────
 export async function deleteGame(uid, gameId) {
+  if (!uid) throw new Error('User not authenticated')
   const ref = doc(db, 'users', uid, 'games', gameId)
   await deleteDoc(ref)
 }

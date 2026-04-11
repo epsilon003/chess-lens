@@ -1,53 +1,79 @@
 // src/components/SaveGameModal.jsx
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './SaveGameModal.css'
 
 export default function SaveGameModal({ onSave, onClose, isSaving }) {
-  const [title, setTitle] = useState(`Position – ${new Date().toLocaleDateString()}`)
-  const [notes, setNotes] = useState('')
+  const [title, setTitle]       = useState('')
+  const [white, setWhite]       = useState('')
+  const [black, setBlack]       = useState('')
+  const [notes, setNotes]       = useState('')
 
-  // Close on Escape
-  useEffect(() => {
-    const handler = (e) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [onClose])
-
-  const submit = (e) => {
-    e.preventDefault()
-    if (title.trim()) onSave({ title: title.trim(), notes: notes.trim() })
+  const handleSubmit = () => {
+    if (!title.trim()) return
+    onSave({ title: title.trim(), white: white.trim(), black: black.trim(), notes: notes.trim() })
   }
 
   return (
-    <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-box card">
+    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-box">
         <div className="modal-header">
           <h2 className="card-title" style={{ margin: 0 }}>Save Game</h2>
-          <button onClick={onClose} className="modal-close">✕</button>
+          <button className="modal-close" onClick={onClose}>✕</button>
         </div>
-        <form onSubmit={submit} className="modal-form">
+
+        <div className="modal-form">
           <div>
-            <label>Title</label>
+            <label>Title *</label>
             <input
-              value={title} onChange={(e) => setTitle(e.target.value)}
-              placeholder="My game title" autoFocus required
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="e.g. Sicilian study, Tournament game..."
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              autoFocus
             />
           </div>
+
+          <div className="player-row">
+            <div>
+              <label>White player</label>
+              <input
+                value={white}
+                onChange={e => setWhite(e.target.value)}
+                placeholder="White"
+              />
+            </div>
+            <div className="vs-divider">vs</div>
+            <div>
+              <label>Black player</label>
+              <input
+                value={black}
+                onChange={e => setBlack(e.target.value)}
+                placeholder="Black"
+              />
+            </div>
+          </div>
+
           <div>
-            <label>Notes (optional)</label>
+            <label>Notes</label>
             <textarea
-              value={notes} onChange={(e) => setNotes(e.target.value)}
-              placeholder="What happened in this game? Any opening, key moments…"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Opening prep, key moments, things to review..."
               rows={3}
             />
           </div>
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn btn-ghost">Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={isSaving}>
-              {isSaving ? 'Saving…' : 'Save Game'}
-            </button>
-          </div>
-        </form>
+        </div>
+
+        <div className="modal-actions">
+          <button onClick={onClose} className="btn btn-ghost">Cancel</button>
+          <button
+            onClick={handleSubmit}
+            className="btn btn-primary"
+            disabled={!title.trim() || isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save game'}
+          </button>
+        </div>
       </div>
     </div>
   )

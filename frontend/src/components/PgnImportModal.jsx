@@ -14,7 +14,7 @@ const EXAMPLE_PGN = `[Event "Immortal Game"]
 Qf6 16. Nc3 Bc5 17. Nd5 Qxb2 18. Bd6 Bxg1 19. e5 Qxa1+
 20. Ke2 Na6 21. Nxg7+ Kd8 22. Qf6+ Nxf6 23. Be7# 1-0`
 
-export default function PgnImportModal({ onImport, onClose }) {
+export default function PgnImportModal({ onImport, onClose, inline = false }) {
   const [pgn,      setPgn]      = useState('')
   const [error,    setError]    = useState('')
   const [parsed,   setParsed]   = useState(null)  // preview info
@@ -59,17 +59,11 @@ export default function PgnImportModal({ onImport, onClose }) {
 
   const loadExample = () => tryParse(EXAMPLE_PGN)
 
-  return (
-    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal-box pgn-modal">
-        <div className="modal-header">
-          <h2 className="card-title" style={{ margin: 0 }}>Import PGN</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
-        </div>
-
-        <p className="pgn-hint">
-          Paste a PGN from Chess.com, Lichess, or any chess tool.
-        </p>
+  const content = (
+    <>
+      <p className="pgn-hint">
+        Paste a PGN from Chess.com, Lichess, or any chess tool.
+      </p>
 
         <textarea
           className="pgn-textarea"
@@ -119,17 +113,27 @@ export default function PgnImportModal({ onImport, onClose }) {
           <button onClick={loadExample} className="btn btn-ghost">
             Load example
           </button>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={onClose} className="btn btn-ghost">Cancel</button>
-            <button
-              onClick={handleImport}
-              className="btn btn-primary"
-              disabled={!parsed || !!error}
-            >
-              Import game
-            </button>
-          </div>
+          <button
+            onClick={handleImport}
+            className="btn btn-primary"
+            disabled={!parsed || !!error}
+          >
+            Import game
+          </button>
         </div>
+    </>
+  )
+
+  if (inline) return <div className="pgn-inline">{content}</div>
+
+  return (
+    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-box pgn-modal">
+        <div className="modal-header">
+          <h2 className="card-title" style={{ margin: 0 }}>Import PGN</h2>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        {content}
       </div>
     </div>
   )

@@ -216,7 +216,7 @@ export default function AnalyzePage() {
   }
 
   // ── Save ──────────────────────────────────────────────────
-  const handleSave = async ({ title, notes }) => {
+  const handleSave = async ({ title, white, black, notes }) => {
     if (!user) {
       setSaveStatus('error')
       setErrorMsg('You must be signed in to save games.')
@@ -225,7 +225,7 @@ export default function AnalyzePage() {
     try {
       setSaveStatus('saving')
       await saveGame(user.uid, {
-        title, notes, fen,
+        title, white, black, notes, fen,
         pgn:   chess.pgn(),
         moves: chess.history(),
       })
@@ -285,7 +285,6 @@ export default function AnalyzePage() {
           <button onClick={sharePosition} className="btn btn-ghost">
             {copied ? 'Copied!' : 'Share'}
           </button>
-          <button onClick={() => setPgnModal(true)} className="btn btn-ghost">Import PGN</button>
           <button onClick={() => setSaveModal(true)} className="btn btn-ghost">Save Game</button>
           <button onClick={reset} className="btn btn-ghost">Reset</button>
         </div>
@@ -297,6 +296,7 @@ export default function AnalyzePage() {
           { key: 'board', label: 'Interactive Board' },
           { key: 'image', label: 'Upload Photo' },
           { key: 'fen',   label: 'FEN String' },
+          { key: 'pgn',   label: 'Import PGN' },
         ].map(({ key, label }) => (
           <button
             key={key}
@@ -378,6 +378,17 @@ export default function AnalyzePage() {
               </div>
             </div>
           )}
+
+          {inputMode === 'pgn' && (
+            <div className="card mt-16">
+              <p className="card-title">Import PGN</p>
+              <PgnImportModal
+                inline
+                onImport={(data) => { handlePgnImport(data); setInputMode('board') }}
+                onClose={() => setInputMode('board')}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right column */}
@@ -439,12 +450,6 @@ export default function AnalyzePage() {
         </div>
       </div>
 
-      {pgnModal && (
-        <PgnImportModal
-          onImport={handlePgnImport}
-          onClose={() => setPgnModal(false)}
-        />
-      )}
       {saveModal && (
         <SaveGameModal
           onSave={handleSave}

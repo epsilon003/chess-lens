@@ -78,3 +78,5 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.pgn-inline { width: 100%; }
