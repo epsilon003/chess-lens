@@ -1,30 +1,20 @@
 // src/services/photoStorage.js
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
-import { app } from '../firebase'
 
-const storage = getStorage(app)
+const CLOUD_NAME   = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 
 export async function uploadBoardPhoto(uid, gameId, imageBlob) {
-  if (!uid || !gameId || !imageBlob) throw new Error('Missing required params')
+  const formData = new FormData()
+  formData.append('file',           imageBlob)
+  formData.append('upload_preset',  UPLOAD_PRESET)
+  formData.append('folder',         `chesslens/${uid}`)
+  formData.append('public_id',      gameId)
 
-  // In local dev, Firebase Storage CORS may not be configured yet.
-  // The game is already saved — just skip the photo upload gracefully.
-  const isDev = window.location.hostname === 'localhost'
-  if (isDev) {
-    console.info('[photoStorage] Skipping upload in local dev (CORS not configured). Configure gsutil cors to enable.')
-    return null
-  }
-
-  const storageRef = ref(storage, `users/${uid}/games/${gameId}/board.jpg`)
-  await uploadBytes(storageRef, imageBlob, { contentType: 'image/jpeg' })
-  return await getDownloadURL(storageRef)
-}
-
-export async function deleteBoardPhoto(uid, gameId) {
-  try {
-    const storageRef = ref(storage, `users/${uid}/games/${gameId}/board.jpg`)
-    await deleteObject(storageRef)
-  } catch {
-    // File may not exist
-  }
+  const res  = await fetch(`https://api.cloudinary.com/v1_1/dmh3lgwh5/image/upload`, {
+    method: 'POST',
+    body:   formData,
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error?.message || 'Upload failed')
+  return data.secure_url
 }
