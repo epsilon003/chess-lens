@@ -1,11 +1,16 @@
-# ♛ ChessLens — AI Chess Analysis Web App
+# ChessLens — AI Chess Analysis Web App
 
-A full-stack chess analysis application:
-- **Image recognition**: upload a photo of any physical board → auto-detect position
-- **Stockfish 16 WASM**: instant in-browser engine analysis (no server round-trip)
-- **Game library**: save, browse, and replay games
-- **Google Auth**: sign in with Google via Firebase
-- **Responsive**: works on phone and desktop
+A full-stack chess analysis application built with React, Stockfish WASM, Firebase, and a custom PyTorch vision model.
+
+- **Image recognition**: upload a photo of any physical board and auto-detect the position
+- **Stockfish in-browser**: instant engine analysis via WebAssembly — no server round-trip
+- **Opening detection**: automatically identifies the opening from move history using the ECO database
+- **Evaluation graph**: centipawn score plotted across every move with quality classification
+- **Move quality**: each move labelled as Best, Good, Inaccuracy, Mistake, or Blunder
+- **Pattern analysis**: Stockfish analyses all your saved games in batch to find recurring mistake patterns
+- **PGN import**: paste any PGN from Lichess or Chess.com to replay and analyse
+- **Share position**: generates a shareable URL encoding the current board position
+- **Game library**: save, browse, and replay games with player names and notes
 
 All free services. No paid APIs.
 
@@ -22,31 +27,68 @@ All free services. No paid APIs.
 ```
 chess-analyzer/
 ├── assets/
-├── frontend/            # React + Vite SPA
+├── frontend/                  # React + Vite SPA
 │   └── src/
-│       ├── components/  # Navbar, Board, AnalysisPanel etc.
-│       ├── hooks/       # useStockfish, useAuth
-│       ├── pages/       # Landing, Analyze, Games, GameDetail
-│       ├── services/    # Firestore CRUD
-│       └── workers/     # Stockfish Web Worker
-├── backend/             # Express API(proxies to vision-service)
-├── vision-service/      # Python Flask + OpenCV + PyTorch CNN
-├── firestore.rules      # Security rules
-└── firebase.json        # Firebase Hosting config
+│       ├── components/        # Navbar, AnalysisPanel, EvalGraph,
+│       │                      # SaveGameModal, PgnImportModal, ImageUpload
+│       ├── hooks/             # useStockfish, useAuth, useOpening, useTheme
+│       ├── pages/             # Landing, Analyze, Games, GameDetail, Patterns
+│       ├── services/          # Firestore CRUD, patternRecognition
+│       └── workers/           # Stockfish Web Worker (loaded from /public)
+├── backend/                   # Express API (proxies to vision-service)
+├── vision-service/            # Python Flask + OpenCV + PyTorch CNN
+├── firestore.rules            # Security rules
+└── firebase.json              # Firebase Hosting config
 ```
+
 ---
+
 ## Key Tech Decisions
 
 | Choice | Reason |
 |--------|--------|
 | Stockfish WASM in browser | No server cost, no latency, full depth analysis |
+| Stockfish.js via local /public | Avoids CDN dependency and CORS issues in Workers |
 | Firebase Auth | Free Google OAuth without building your own auth server |
 | Firestore | Free tier (50k reads/day); no SQL setup |
 | MobileNetV3-Small | Fast, accurate, runs on CPU — no GPU needed for inference |
 | React + Vite | Fast dev server, great ecosystem, HMR |
-| Render.com | Free hobby tier for always-on Node/Python services |
+| Cloudflare Pages | Edge hosting, automatic GitHub deploys, free tier |
+| Cloudflare Workers | Proxy backend — no spin-down, 100k requests/day free |
+| Render.com | Vision service hosting — free hobby tier for Python/Flask |
 
 ---
+
+## Features in Detail
+
+### Opening Detection
+After each move, the position is matched against 80+ ECO openings sorted by specificity. The opening name and ECO code appear below the page title as soon as the position is recognised.
+
+### Evaluation Graph
+Plots centipawn scores across every move using Recharts. Hover any point to see the move, evaluation, and quality label. Click any point to jump directly to that position. Blunders and mistakes are highlighted as coloured dots on the line.
+
+### Move Quality Classification
+Each move is compared to the previous evaluation from the moving side's perspective and classified using standard thresholds:
+
+| Label | Centipawn drop |
+|-------|---------------|
+| Best | 0 |
+| Good | 0 to -30 |
+| Inaccuracy | -30 to -100 |
+| Mistake | -100 to -300 |
+| Blunder | worse than -300 |
+
+### Pattern Recognition
+Stockfish analyses every saved game in batch, evaluating each position at depth 10. Patterns detected include phase-based mistake rates (opening, middlegame, endgame), piece-specific weaknesses, late-game accuracy collapse, and overall accuracy. Each pattern includes a plain-English explanation and actionable advice. Analysis runs entirely in the browser — no backend required.
+
+### PGN Import
+Paste any PGN directly into the Import PGN tab next to the board. The PGN is parsed live using chess.js and a preview card shows players, event, date, move count, and result before importing. The Immortal Game is included as a built-in example.
+
+### Share Position
+The Share button encodes the current FEN into the URL query string and copies it to clipboard. Anyone opening the link lands directly on that board position.
+
+---
+
 ## Recognition Model
 
 Detects chess pieces from board images and outputs FEN strings.
@@ -56,79 +98,112 @@ Detects chess pieces from board images and outputs FEN strings.
 | Property | Value |
 |----------|-------|
 | Architecture | MobileNetV3-Small |
-| Input | 64×64 RGB cell image |
+| Input | 64x64 RGB cell image |
 | Output | 13-class prediction (K Q R B N P k q r b n p .) |
 | Parameters | ~1.5M |
-| Weights file | `model_weights.pth` |
+| Weights file | model_weights.pth |
 
 ### Dataset
 
 | Property | Value |
 |----------|-------|
-| Dataset | [ChessRender360](https://www.kaggle.com/datasets/mmkoya/chessrender360) |
+| Dataset | ChessRender360 (kaggle.com/datasets/mmkoya/chessrender360) |
 | Total images | 10,000 rendered chess positions |
-| Image size | 2000×2000 RGB |
+| Image size | 2000x2000 RGB |
 | Cell samples | 640,000 (64 per image) |
-| Train / Val split | 80% / 20% |
+| Annotation | Board corners + FEN per image used for exact perspective warp |
 
 ### Training
 
 | Property | Value |
 |----------|-------|
-| Epochs | 10 (fine-tuned from 30-epoch checkpoint) |
+| Epochs | 30 |
 | Batch size | 128 |
-| Learning rate | 3e-3 |
+| Learning rate | 1e-3 |
 | Optimizer | Adam |
 | Scheduler | StepLR (step=10, gamma=0.5) |
-| Device | Tesla T4 GPU |
+| Device | Tesla T4 GPU (Kaggle notebook) |
+| Platform | Kaggle notebook |
 
 ### Inference Pipeline
 
-1. Photo is taken from phone browser and sent to Flask server
-2. `find_board()` detects and perspective-warps the board to 512×512
-3. Board is sliced into 64 cells (one per square)
+1. Photo is uploaded from the browser and sent to the Flask server
+2. find_board() detects the board quadrilateral via contour detection and perspective-warps it to 512x512
+3. The board is sliced into 64 cells, one per square
 4. MobileNetV3 classifies each cell into one of 13 classes
-5. Predictions are assembled into a valid FEN string
+5. Predictions are assembled into a valid FEN string via python-chess
 
 ### Output Format
 
+```json
+{
+  "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+  "confidence": 0.87
+}
 ```
-recognize_board(image_bytes) → {{'fen': 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', 'confidence': 0.87}}
-```
+
 ---
+
 ## Firestore Database Schema
 
 ```
 Firestore
-│
-└── users/                          ← top-level collection
-    └── {uid}/                      ← one document per Google user
-        │    (uid = Firebase Auth user ID)
-        │
-        └── games/                  ← subcollection inside each user
-            └── {gameId}/           ← auto-generated document ID
+└── users/
+    └── {uid}/
+        └── games/
+            └── {gameId}/
                   title:     string
+                  white:     string   (white player name)
+                  black:     string   (black player name)
                   notes:     string
-                  fen:       string   ← board position at save time
-                  pgn:       string   ← full game in PGN format
-                  moves:     array    ← ["e4", "e5", "Nf3", ...]
+                  fen:       string   (board position at save time)
+                  pgn:       string   (full game in PGN format)
+                  moves:     array    (["e4", "e5", "Nf3", ...])
                   createdAt: timestamp
                   updatedAt: timestamp
 ```
 
 ---
-## How to Run on your Local Machine
 
-1. Run
-   ```
-   git clone https://github.com/epsilon003/chess-lens.git
-   ```
-2. Open the folder in your IDE and navigate to the "frontend" sub-folder
-   ```
-   cd frontend
-   ```
-3. Finally run
-   ```
-   npm install
-   npm run dev
-   ```
+## Hosting
+
+| Service | What it hosts |
+|---------|--------------|
+| Cloudflare Pages | React frontend — auto-deploys on every GitHub push |
+| Cloudflare Workers | Express backend proxy |
+| Render.com | Python Flask vision service |
+| Firebase | Authentication + Firestore database |
+
+The Cloudflare Pages _redirects file handles both SPA routing and API proxying:
+
+```
+/api/*  https://your-backend.onrender.com/api/:splat  200
+/*      /index.html  200
+```
+
+---
+
+## How to Run Locally
+
+Clone the repo and start the frontend:
+
+```bash
+git clone https://github.com/epsilon003/chess-lens.git
+cd chess-lens/frontend
+npm install
+npm run dev
+```
+
+The frontend runs at http://localhost:5173. Stockfish, Firebase Auth, and Firestore all work without the backend or vision service running.
+
+To run the vision service locally:
+
+```bash
+cd vision-service
+python -m venv venv
+venv\Scripts\Activate.ps1          # Windows
+pip install -r requirements.txt
+python app.py                       # runs on http://localhost:8000
+```
+
+The backend proxy is only needed in production to forward /api requests to the vision service. In local development, Vite proxies /api to localhost:5000 automatically.
