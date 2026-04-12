@@ -1,17 +1,24 @@
-// stockfish.worker.js
-// Uses Stockfish.js 10 via CDN — works reliably in all browsers without bundler issues.
-// (Stockfish 16 WASM requires SharedArrayBuffer + cross-origin isolation headers
-//  which need extra server config; Stockfish 10 works everywhere out of the box)
+// src/workers/stockfish.worker.js
+// Loads Stockfish from /public/stockfish.js (local — no CDN dependency)
+self.importScripts('/stockfish.js')
 
-self.importScripts('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js')
+let engine = null
 
-let engine = STOCKFISH()
-
-engine.onmessage = function (event) {
-  const msg = typeof event === 'object' ? event.data : event
-  self.postMessage(msg)
+function init() {
+  if (typeof STOCKFISH === 'undefined') {
+    console.error('STOCKFISH not defined — make sure stockfish.js is in frontend/public/')
+    return
+  }
+  engine = STOCKFISH()
+  engine.onmessage = function (event) {
+    const msg = typeof event === 'object' ? event.data : event
+    self.postMessage(msg)
+  }
 }
 
 self.onmessage = function (event) {
-  engine.postMessage(event.data)
+  if (!engine) init()
+  if (engine) engine.postMessage(event.data)
 }
+
+init()

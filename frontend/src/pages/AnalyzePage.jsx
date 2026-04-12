@@ -12,6 +12,7 @@ import SaveGameModal        from '../components/SaveGameModal'
 import PgnImportModal       from '../components/PgnImportModal'
 import EvalGraph            from '../components/EvalGraph'
 import { saveGame }         from '../services/gamesService'
+import { uploadBoardPhoto } from '../services/photoStorage'
 import './AnalyzePage.css'
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
@@ -29,6 +30,7 @@ export default function AnalyzePage() {
   const [saveStatus,setSaveStatus]  = useState('')
   const [copied,    setCopied]      = useState(false)
   const [pgnModal,  setPgnModal]    = useState(false)
+  const [photoBlob, setPhotoBlob]   = useState(null)
   const [boardOrientation, setBoardOrientation] = useState('white')
   const [moveHistory, setMoveHistory] = useState([])
   const [selectedSquare,   setSelectedSquare]   = useState(null)
@@ -224,11 +226,22 @@ export default function AnalyzePage() {
     }
     try {
       setSaveStatus('saving')
-      await saveGame(user.uid, {
+      const gameId = await saveGame(user.uid, {
         title, white, black, notes, fen,
         pgn:   chess.pgn(),
         moves: chess.history(),
       })
+      // Upload board photo if one was captured from image upload
+      if (photoBlob && gameId) {
+        try {
+          const photoUrl = await uploadBoardPhoto(user.uid, gameId, photoBlob)
+          // Update the game doc with the photo URL
+          const { updateGame } = await import('../services/gamesService')
+          await updateGame(user.uid, gameId, { photoUrl })
+        } catch (photoErr) {
+          console.warn('Photo upload failed (game saved without photo):', photoErr.message)
+        }
+      }
       setSaveStatus('saved')
       setSaveModal(false)
       setTimeout(() => setSaveStatus(''), 2000)
@@ -359,7 +372,7 @@ export default function AnalyzePage() {
           {inputMode === 'image' && (
             <div className="card mt-16">
               <p className="card-title">Upload Board Photo</p>
-              <ImageUpload onFenReceived={onFenReceived} onError={setErrorMsg} />
+              <ImageUpload onFenReceived={onFenReceived} onError={setErrorMsg} onPhotoReady={setPhotoBlob} />
             </div>
           )}
 
