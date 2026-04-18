@@ -1,13 +1,14 @@
 // src/components/Navbar.jsx
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth }  from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import './Navbar.css'
 
 export default function Navbar() {
-  const { user, signInWithGoogle, logout } = useAuth()
+  const { user, logout } = useAuth()
   const { theme, toggle } = useTheme()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const navLinks = [
     { to: '/analyze',  label: 'Analyze'  },
@@ -19,7 +20,7 @@ export default function Navbar() {
     <>
       <nav className="navbar">
         <Link to="/" className="navbar-logo">
-          ♛ <span>ChessLens</span>
+          &#9819; <span>ChessLens</span>
         </Link>
 
         {user && (
@@ -45,15 +46,19 @@ export default function Navbar() {
 
           {user ? (
             <div className="user-info">
-              <img src={user.photoURL} alt={user.displayName} className="avatar" />
-              <span className="user-name">{user.displayName?.split(' ')[0]}</span>
+              {user.photoURL && (
+                <img src={user.photoURL} alt={user.displayName} className="avatar" />
+              )}
+              <span className="user-name">
+                {user.displayName?.split(' ')[0] || user.email?.split('@')[0]}
+              </span>
               <button onClick={logout} className="btn btn-ghost btn-sm">
                 Sign out
               </button>
             </div>
           ) : (
-            <button onClick={signInWithGoogle} className="btn btn-primary btn-sm">
-              <GoogleIcon /> Sign in
+            <button onClick={() => navigate('/auth')} className="btn btn-primary btn-sm">
+              Sign in
             </button>
           )}
         </div>
