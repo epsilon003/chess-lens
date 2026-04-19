@@ -2,17 +2,9 @@
 
 A full-stack chess analysis application built with React, Stockfish WASM, Firebase, and a custom PyTorch vision model.
 
-- **Image recognition**: upload a photo of any physical board and auto-detect the position
-- **Stockfish in-browser**: instant engine analysis via WebAssembly — no server round-trip
-- **Opening detection**: automatically identifies the opening from move history using the ECO database
-- **Evaluation graph**: centipawn score plotted across every move with quality classification
-- **Move quality**: each move labelled as Best, Good, Inaccuracy, Mistake, or Blunder
-- **Pattern analysis**: Stockfish analyses all your saved games in batch to find recurring mistake patterns
-- **PGN import**: paste any PGN from Lichess or Chess.com to replay and analyse
-- **Share position**: generates a shareable URL encoding the current board position
-- **Game library**: save, browse, and replay games with player names and notes
+ ![Firebase](https://img.shields.io/badge/firebase-%23039BE5.svg?style=for-the-badge&logo=firebase) ![Render](https://img.shields.io/badge/Render-%46E3B7.svg?style=for-the-badge&logo=render&logoColor=white) ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB) ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
 
-All free services. No paid APIs.
+![Hero-Page](assets/Hero.PNG)
 
 ---
 
