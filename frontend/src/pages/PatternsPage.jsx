@@ -1,8 +1,10 @@
 // src/pages/PatternsPage.jsx
-import { useState, useEffect } from 'react'
-import { useAuth }             from '../hooks/useAuth'
-import { loadGames }           from '../services/gamesService'
-import { analysePatterns }     from '../services/patternRecognition'
+import { useState, useEffect }      from 'react'
+import { useAuth }                  from '../hooks/useAuth'
+import { loadGames }                from '../services/gamesService'
+import { analysePatterns }          from '../services/patternRecognition'
+import { canRunAnalysis, recordAnalysisUsage, getMembership } from '../services/membershipService'
+import UpgradeModal                 from '../components/UpgradeModal'
 import './PatternsPage.css'
 
 const SEVERITY_CONFIG = {
@@ -49,9 +51,12 @@ function PatternCard({ pattern }) {
 
 export default function PatternsPage() {
   const { user }        = useAuth()
-  const [games,      setGames]      = useState([])
-  const [loading,    setLoading]    = useState(true)
-  const [analysing,  setAnalysing]  = useState(false)
+  const [games,        setGames]        = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [analysing,    setAnalysing]    = useState(false)
+  const [membership,   setMembership]   = useState(null)
+  const [usageStatus,  setUsageStatus]  = useState(null)
+  const [showUpgrade,  setShowUpgrade]  = useState(false)
   const [progress,   setProgress]   = useState({ current: 0, total: 0 })
   const [result,     setResult]     = useState(null)
   const [error,      setError]      = useState('')
@@ -59,14 +64,36 @@ export default function PatternsPage() {
 
   useEffect(() => {
     if (!user) return
-    loadGames(user.uid)
-      .then(setGames)
-      .catch(() => setError('Could not load games.'))
+    Promise.all([
+      loadGames(user.uid),
+      getMembership(user.uid),
+      canRunAnalysis(user.uid),
+    ]).then(([g, m, u]) => {
+      setGames(g)
+      setMembership(m)
+      setUsageStatus(u)
+    }).catch(() => setError('Could not load data.'))
       .finally(() => setLoading(false))
   }, [user])
 
+  const refreshUsage = async () => {
+    const u = await canRunAnalysis(user.uid)
+    const m = await getMembership(user.uid)
+    setUsageStatus(u)
+    setMembership(m)
+  }
+
   const runAnalysis = async () => {
     if (games.length === 0) return
+
+    // Check usage limit before running
+    const usage = await canRunAnalysis(user.uid)
+    setUsageStatus(usage)
+    if (!usage.allowed) {
+      setShowUpgrade(true)
+      return
+    }
+
     setAnalysing(true)
     setResult(null)
     setError('')
@@ -78,7 +105,14 @@ export default function PatternsPage() {
         playerColor,
         (current, total) => setProgress({ current, total })
       )
-      setResult(res)
+      if (res.error) {
+        setError(res.error)
+      } else {
+        setResult(res)
+        // Record usage — only count successful analyses
+        await recordAnalysisUsage(user.uid)
+        await refreshUsage()
+      }
     } catch (err) {
       console.error(err)
       setError('Analysis failed. Please try again.')
@@ -99,11 +133,33 @@ export default function PatternsPage() {
     <div className="page patterns-page">
       <div className="patterns-header">
         <div>
-          <h1 className="page-title">Pattern Analysis</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <h1 className="page-title" style={{ margin: 0 }}>Pattern Analysis</h1>
+            {membership?.pro && (
+              <span className="pro-badge">PRO</span>
+            )}
+          </div>
           <p className="patterns-subtitle">
             Stockfish analyses all your saved games in batch to find recurring mistakes and strengths.
           </p>
+          {usageStatus && !usageStatus.isPro && (
+            <div className="usage-counter">
+              <span className={usageStatus.remaining === 0 ? 'usage-exhausted' : ''}>
+                {usageStatus.remaining} of 3 free analyses remaining this week
+              </span>
+              {usageStatus.remaining === 0 && (
+                <button className="auth-link" onClick={() => setShowUpgrade(true)} style={{ marginLeft: 8 }}>
+                  Upgrade to Pro
+                </button>
+              )}
+            </div>
+          )}
         </div>
+        {!membership?.pro && (
+          <button className="btn btn-ghost" onClick={() => setShowUpgrade(true)}>
+            Upgrade to Pro
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -199,6 +255,14 @@ export default function PatternsPage() {
             </div>
           )}
         </>
+      )}
+
+      {showUpgrade && (
+        <UpgradeModal
+          remaining={usageStatus?.remaining ?? 0}
+          onClose={() => setShowUpgrade(false)}
+          onProApplied={refreshUsage}
+        />
       )}
     </div>
   )

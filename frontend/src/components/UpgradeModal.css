@@ -1,0 +1,128 @@
+/* src/components/UpgradeModal.css */
+.upgrade-modal { max-width: 420px; }
+
+.upgrade-limit-notice {
+  font-size: 13px;
+  color: var(--red);
+  background: var(--red-glow);
+  border: 1px solid rgba(192,57,43,0.25);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+.upgrade-limit-notice--soft {
+  color: var(--warn);
+  background: rgba(183,119,13,0.08);
+  border-color: rgba(183,119,13,0.25);
+}
+
+/* Tabs */
+.upgrade-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 20px;
+}
+.upgrade-tab {
+  flex: 1;
+  padding: 7px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.upgrade-tab.active {
+  background: var(--bg-0);
+  color: var(--text-1);
+  font-weight: 500;
+}
+
+/* Pricing */
+.upgrade-content { display: flex; flex-direction: column; gap: 16px; }
+
+.upgrade-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.upgrade-amount {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--text-1);
+  line-height: 1;
+}
+.upgrade-period { font-size: 14px; color: var(--text-3); }
+
+/* Features */
+.upgrade-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.upgrade-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.upgrade-check {
+  color: var(--green);
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.upgrade-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 12px;
+  font-size: 14px;
+}
+
+.upgrade-note {
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Promo */
+.upgrade-promo-hint {
+  font-size: 13px;
+  color: var(--text-2);
+}
+.promo-input-row {
+  display: flex;
+  gap: 8px;
+}
+.promo-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.promo-feedback {
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+}
+.promo-feedback--success {
+  color: var(--green);
+  background: rgba(46,125,82,0.1);
+  border-color: rgba(46,125,82,0.3);
+}
+.promo-feedback--error {
+  color: var(--red);
+  background: var(--red-glow);
+  border-color: rgba(192,57,43,0.3);
+}

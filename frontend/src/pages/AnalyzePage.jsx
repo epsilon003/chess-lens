@@ -68,9 +68,23 @@ export default function AnalyzePage() {
 
   // ── Load FEN from URL on first render ──────────────────────
   useEffect(() => {
-    const fenFromUrl = searchParams.get('fen')
+    const fenFromUrl    = searchParams.get('fen')
+    const upgradeStatus = searchParams.get('upgrade')
+
     if (fenFromUrl) {
       loadFen(decodeURIComponent(fenFromUrl))
+    }
+
+    if (upgradeStatus === 'success') {
+      setSearchParams({})
+      setTimeout(() => {
+        setErrorMsg('You are now a Pro member! Enjoy unlimited pattern analysis.')
+        setTimeout(() => setErrorMsg(''), 5000)
+      }, 500)
+    }
+
+    if (upgradeStatus === 'cancelled') {
+      setSearchParams({})
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

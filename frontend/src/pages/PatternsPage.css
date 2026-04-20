@@ -136,3 +136,42 @@
   text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--text-3); margin-right: 6px;
 }
+
+/* Pro badge */
+.pro-badge {
+  background: var(--red);
+  color: #f5f0e8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  vertical-align: middle;
+}
+
+/* Usage counter */
+.usage-counter {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.usage-exhausted { color: var(--red); font-weight: 500; }
+
+/* auth-link reuse for inline upgrade link */
+.auth-link {
+  background: none;
+  border: none;
+  color: var(--red);
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.auth-link:hover { opacity: 0.8; }
