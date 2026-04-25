@@ -108,6 +108,7 @@ function useAnimeOnReveal(selector) {
 function ChessScene3D() {
   const mountRef = useRef(null)
   const sceneRef = useRef(null)
+  const mountedRef = useRef(true)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -129,8 +130,8 @@ function ChessScene3D() {
 
       scene = new THREE.Scene()
 
-      camera = new THREE.PerspectiveCamera(45, canvasW / canvasH, 0.1, 100)
-      camera.position.set(0, 5.5, 7)
+      camera = new THREE.PerspectiveCamera(55, canvasW / canvasH, 0.1, 100)
+      camera.position.set(0, 4, 10)
       camera.lookAt(0, 0, 0)
 
       const ambient = new THREE.AmbientLight(0xf5f0e8, 0.6)
@@ -153,6 +154,7 @@ function ChessScene3D() {
 
       const boardGroup = new THREE.Group()
       scene.add(boardGroup)
+      
       sceneRef.current = { boardGroup, fillLight, rimLight }
 
       const baseGeo  = new THREE.BoxGeometry(8.4, 0.25, 8.4)
@@ -377,9 +379,12 @@ function ChessScene3D() {
     document.head.appendChild(script)
 
     return () => {
+      mountedRef.current = false
       sceneRef.current?._cleanup?.()
       const canvas = mount.querySelector('canvas')
       if (canvas) canvas.remove()
+      sceneRef.current = null
+      mountedRef.current = true
     }
   }, [])
 
