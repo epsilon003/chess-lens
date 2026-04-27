@@ -183,10 +183,10 @@
 }
 .three-scene {
   width: 100%;
-  height: clamp(320px, 55vh, 520px);
+  height: clamp(500px, 70vh, 300px);
   display: block;
   cursor: grab;
-  background: #0a0806;
+  background: #151313;
 }
 .three-scene:active { cursor: grabbing; }
 

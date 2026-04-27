@@ -1,7 +1,10 @@
 // src/pages/LandingPage.jsx
 import { useAuth }     from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import './LandingPage.css'
 
 function useSectionReveal() {
@@ -106,17 +109,19 @@ function useAnimeOnReveal(selector) {
 }
 
 function ChessScene3D() {
-  const mountRef = useRef(null)
-  const sceneRef = useRef(null)
+  const mountRef   = useRef(null)
+  const sceneRef   = useRef(null)
+  const mountedRef = useRef(true)
 
   useEffect(() => {
     const mount = mountRef.current
     if (!mount) return
 
-    let animId, THREE_lib, renderer, scene, camera
+    let animId, renderer, scene, camera
 
-    const init = (THREE) => {
-      THREE_lib = THREE
+    const init = () => {
+      if (!mountedRef.current) return
+
       const canvasW = mount.clientWidth  || 440
       const canvasH = mount.clientHeight || 420
 
@@ -124,181 +129,86 @@ function ChessScene3D() {
       renderer.setSize(canvasW, canvasH)
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.shadowMap.enabled = true
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap
+      renderer.shadowMap.type = THREE.PCFShadowMap
+      renderer.toneMapping = THREE.ACESFilmicToneMapping
+      renderer.toneMappingExposure = 1.2
       mount.appendChild(renderer.domElement)
 
       scene = new THREE.Scene()
 
-      camera = new THREE.PerspectiveCamera(45, canvasW / canvasH, 0.1, 100)
-      camera.position.set(0, 5.5, 7)
+      camera = new THREE.PerspectiveCamera(55, canvasW / canvasH, 0.1, 100)
+      camera.position.set(0, 4, 10)
       camera.lookAt(0, 0, 0)
 
-      const ambient = new THREE.AmbientLight(0xf5f0e8, 0.6)
+      const ambient = new THREE.AmbientLight(0xf5f0e8, 1.2)
       scene.add(ambient)
 
-      const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.8)
+      const dirLight = new THREE.DirectionalLight(0xfff4e0, 2.4)
       dirLight.position.set(5, 10, 6)
       dirLight.castShadow = true
       dirLight.shadow.mapSize.width  = 1024
       dirLight.shadow.mapSize.height = 1024
       scene.add(dirLight)
 
-      const fillLight = new THREE.PointLight(0xc0392b, 0.5, 20)
-      fillLight.position.set(-5, 3, -3)
+      const fillLight = new THREE.PointLight(0xd4a96a, 1.4, 25)
+      fillLight.position.set(-6, 5, 4)
       scene.add(fillLight)
 
-      const rimLight = new THREE.PointLight(0x1a5276, 0.4, 20)
-      rimLight.position.set(5, 2, -6)
+      const rimLight = new THREE.PointLight(0xfffffff, 1.2, 22)
+      rimLight.position.set(6, 4, -5)
       scene.add(rimLight)
+
+      const backLight = new THREE.PointLight(0xb0c4de, 0.9, 20)
+      backLight.position.set(-4, 3, -7)
+      scene.add(backLight)
 
       const boardGroup = new THREE.Group()
       scene.add(boardGroup)
       sceneRef.current = { boardGroup, fillLight, rimLight }
 
-      const baseGeo  = new THREE.BoxGeometry(8.4, 0.25, 8.4)
-      const baseMat  = new THREE.MeshStandardMaterial({ color: 0x5a3a1a, roughness: 0.8, metalness: 0.1 })
-      const baseMesh = new THREE.Mesh(baseGeo, baseMat)
-      baseMesh.position.y = -0.125
-      baseMesh.receiveShadow = true
-      boardGroup.add(baseMesh)
+      const dracoLoader = new DRACOLoader()
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/')
 
-      const borderGeo = new THREE.BoxGeometry(8.6, 0.28, 8.6)
-      const borderMat = new THREE.MeshStandardMaterial({ color: 0x3a2208, roughness: 0.9 })
-      const borderMesh = new THREE.Mesh(borderGeo, borderMat)
-      borderMesh.position.y = -0.15
-      boardGroup.add(borderMesh)
 
-      const lightMat = new THREE.MeshStandardMaterial({ color: 0xf0d9b5, roughness: 0.6, metalness: 0.05 })
-      const darkMat  = new THREE.MeshStandardMaterial({ color: 0x9a6a3a, roughness: 0.7, metalness: 0.05 })
-      const sqGeo    = new THREE.BoxGeometry(1, 0.05, 1)
+      const loader = new GLTFLoader()
+      loader.setDRACOLoader(dracoLoader)
+      loader.load(
+      '/models/chess_set.glb',
+      (gltf) => {
+      if (!mountedRef.current) return
+      const model = gltf.scene
 
-      for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-          const isLight = (row + col) % 2 === 0
-          const mesh = new THREE.Mesh(sqGeo, isLight ? lightMat : darkMat)
-          mesh.position.set(col - 3.5, 0.026, row - 3.5)
-          mesh.receiveShadow = true
-          boardGroup.add(mesh)
-        }
-      }
+      const box    = new THREE.Box3().setFromObject(model)
+      const size   = box.getSize(new THREE.Vector3())
+      const center = box.getCenter(new THREE.Vector3())
 
-      const wMat = new THREE.MeshStandardMaterial({ color: 0xf5f0e8, roughness: 0.3, metalness: 0.15 })
-      const bMat = new THREE.MeshStandardMaterial({ color: 0x1a1612, roughness: 0.4, metalness: 0.25 })
+      const maxHoriz = Math.max(size.x, size.z)
+      const scale    = 8.2 / maxHoriz
 
-      function addCylinder(group, mat, rx, ry, height, y, segs = 16) {
-        const geo  = new THREE.CylinderGeometry(rx, ry, height, segs)
-        const mesh = new THREE.Mesh(geo, mat)
-        mesh.position.y = y
-        mesh.castShadow = true
-        group.add(mesh)
-      }
-      function addSphere(group, mat, r, y, segs = 12) {
-        const geo  = new THREE.SphereGeometry(r, segs, segs)
-        const mesh = new THREE.Mesh(geo, mat)
-        mesh.position.y = y
-        mesh.castShadow = true
-        group.add(mesh)
-      }
-      function addBox(group, mat, w, h, d, y) {
-        const geo  = new THREE.BoxGeometry(w, h, d)
-        const mesh = new THREE.Mesh(geo, mat)
-        mesh.position.y = y
-        mesh.castShadow = true
-        group.add(mesh)
-      }
-      function addTorus(group, mat, r, tube, y) {
-        const geo  = new THREE.TorusGeometry(r, tube, 8, 24)
-        const mesh = new THREE.Mesh(geo, mat)
-        mesh.position.y = y
-        mesh.rotation.x = Math.PI / 2
-        mesh.castShadow = true
-        group.add(mesh)
-      }
+      model.scale.setScalar(scale)
 
-      function makePawn(mat) {
-        const g = new THREE.Group()
-        addCylinder(g, mat, 0.36, 0.42, 0.1,  0.05, 12)
-        addCylinder(g, mat, 0.22, 0.30, 0.55, 0.37, 12)
-        addSphere(g, mat, 0.28, 0.82, 12)
-        return g
-      }
-      function makeRook(mat) {
-        const g = new THREE.Group()
-        addCylinder(g, mat, 0.38, 0.44, 0.1,  0.05, 12)
-        addCylinder(g, mat, 0.28, 0.34, 0.7,  0.45)
-        addCylinder(g, mat, 0.34, 0.34, 0.1,  0.85)
-        addBox(g, mat, 0.14, 0.22, 0.56, 1.0)
-        addBox(g, mat, 0.56, 0.22, 0.14, 1.0)
-        return g
-      }
-      function makeKnight(mat) {
-        const g = new THREE.Group()
-        addCylinder(g, mat, 0.38, 0.44, 0.1,  0.05, 12)
-        addCylinder(g, mat, 0.24, 0.32, 0.65, 0.42)
-        const headBox = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.5, 0.52), mat)
-        headBox.position.set(0.08, 1.0, 0)
-        headBox.rotation.z = -0.18
-        headBox.castShadow = true
-        g.add(headBox)
-        addSphere(g, mat, 0.22, 1.28, 8)
-        return g
-      }
-      function makeBishop(mat) {
-        const g = new THREE.Group()
-        addCylinder(g, mat, 0.38, 0.44, 0.1,  0.05, 12)
-        addCylinder(g, mat, 0.2,  0.28, 0.7,  0.45)
-        addSphere(g, mat, 0.26, 0.92, 12)
-        addCylinder(g, mat, 0.06, 0.06, 0.22, 1.24)
-        addSphere(g, mat, 0.1,  1.38, 8)
-        return g
-      }
-      function makeQueen(mat) {
-        const g = new THREE.Group()
-        addCylinder(g, mat, 0.42, 0.48, 0.1,  0.05, 12)
-        addCylinder(g, mat, 0.22, 0.36, 0.8,  0.5)
-        addTorus(g, mat, 0.28, 0.07, 1.0)
-        addSphere(g, mat, 0.28, 1.18, 12)
-        addSphere(g, mat, 0.1,  1.54, 8)
-        return g
-      }
-      function makeKing(mat) {
-        const g = new THREE.Group()
-        addCylinder(g, mat, 0.44, 0.5,  0.1,  0.05, 12)
-        addCylinder(g, mat, 0.24, 0.38, 0.85, 0.52)
-        addTorus(g, mat, 0.3,  0.07, 1.05)
-        addSphere(g, mat, 0.3, 1.25, 12)
-        addBox(g, mat, 0.12, 0.4,  0.12, 1.68)
-        addBox(g, mat, 0.28, 0.12, 0.12, 1.78)
-        return g
-      }
+      model.position.set(
+        -center.x * scale,
+        -box.min.y * scale,
+        -center.z * scale,
+      )
 
-      const SCALE = 0.82
-
-      function placePiece(maker, mat, col, row) {
-        const p = maker(mat)
-        p.scale.setScalar(SCALE)
-        p.position.set(col - 3.5, 0.05, row - 3.5)
-        boardGroup.add(p)
+      model.traverse(child => {
+      if (child.isMesh) {
+        child.castShadow    = true
+        child.receiveShadow = true
       }
+      })
+      boardGroup.add(model)
+      },
+      undefined,
+      (error) => console.error('GLTFLoader error:', error)
+      )
 
-      const W = wMat, B = bMat
-      placePiece(makeRook,   W, 0, 0); placePiece(makeRook,   W, 7, 0)
-      placePiece(makeKnight, W, 1, 0); placePiece(makeKnight, W, 6, 0)
-      placePiece(makeBishop, W, 2, 0); placePiece(makeBishop, W, 5, 0)
-      placePiece(makeQueen,  W, 3, 0)
-      placePiece(makeKing,   W, 4, 0)
-      for (let c = 0; c < 8; c++) placePiece(makePawn, W, c, 1)
-
-      placePiece(makeRook,   B, 0, 7); placePiece(makeRook,   B, 7, 7)
-      placePiece(makeKnight, B, 1, 7); placePiece(makeKnight, B, 6, 7)
-      placePiece(makeBishop, B, 2, 7); placePiece(makeBishop, B, 5, 7)
-      placePiece(makeQueen,  B, 3, 7)
-      placePiece(makeKing,   B, 4, 7)
-      for (let c = 0; c < 8; c++) placePiece(makePawn, B, c, 6)
-
+      // Drag interaction
       let isDragging = false
       let prevMouse  = { x: 0, y: 0 }
-      let rotY = -0.3, rotX = 0.28
+      let rotY = -0.3, rotX = 0.18
       let targetRotY = rotY, targetRotX = rotX
 
       const onDown = (e) => {
@@ -306,14 +216,14 @@ function ChessScene3D() {
         const p = e.touches ? e.touches[0] : e
         prevMouse = { x: p.clientX, y: p.clientY }
       }
-      const onUp = () => { isDragging = false }
+      const onUp   = () => { isDragging = false }
       const onMove = (e) => {
         if (!isDragging) return
-        const p = e.touches ? e.touches[0] : e
+        const p  = e.touches ? e.touches[0] : e
         const dx = (p.clientX - prevMouse.x) * 0.01
         const dy = (p.clientY - prevMouse.y) * 0.008
         targetRotY += dx
-        targetRotX  = Math.max(-0.1, Math.min(0.7, targetRotX + dy))
+        targetRotX  = Math.max(-0.05, Math.min(0.45, targetRotX + dy))
         prevMouse = { x: p.clientX, y: p.clientY }
       }
 
@@ -328,13 +238,13 @@ function ChessScene3D() {
       renderer.domElement.addEventListener('mousedown', () => { autoRot = false })
       renderer.domElement.addEventListener('mouseup',   () => { setTimeout(() => { autoRot = true }, 2000) })
 
+      // Animate loop
       const clock = new THREE.Clock()
       const animate = () => {
         animId = requestAnimationFrame(animate)
         const t = clock.getElapsedTime()
 
         if (autoRot) targetRotY += 0.003
-
         rotY += (targetRotY - rotY) * 0.06
         rotX += (targetRotX - rotX) * 0.06
 
@@ -342,14 +252,15 @@ function ChessScene3D() {
         boardGroup.rotation.x = rotX
 
         if (sceneRef.current) {
-          sceneRef.current.fillLight.intensity = 0.4 + Math.sin(t * 0.8) * 0.15
-          sceneRef.current.rimLight.intensity  = 0.3 + Math.cos(t * 0.6) * 0.12
+          sceneRef.current.fillLight.intensity = 15.0 + Math.sin(t * 0.8) * 0.15
+          sceneRef.current.rimLight.intensity  = 15.0 + Math.cos(t * 0.6) * 0.12
         }
 
         renderer.render(scene, camera)
       }
       animate()
 
+      // Resize
       const onResize = () => {
         const w = mount.clientWidth, h = mount.clientHeight
         renderer.setSize(w, h)
@@ -357,6 +268,7 @@ function ChessScene3D() {
         camera.updateProjectionMatrix()
       }
       window.addEventListener('resize', onResize)
+
       sceneRef.current._cleanup = () => {
         cancelAnimationFrame(animId)
         renderer.domElement.removeEventListener('mousedown',  onDown)
@@ -370,16 +282,15 @@ function ChessScene3D() {
       }
     }
 
-    if (window.THREE) { init(window.THREE); return }
-    const script = document.createElement('script')
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'
-    script.onload = () => init(window.THREE)
-    document.head.appendChild(script)
+    init()
 
     return () => {
+      mountedRef.current = false
       sceneRef.current?._cleanup?.()
       const canvas = mount.querySelector('canvas')
       if (canvas) canvas.remove()
+      sceneRef.current = null
+      mountedRef.current = true
     }
   }, [])
 
@@ -536,7 +447,6 @@ export default function LandingPage() {
   return (
     <div className="landing-v2">
 
-      {/* ── HERO ──────────────────────────────────────────── */}
       <section className="hero-v2">
         <div className="hero-parallax-bg" aria-hidden="true">
           <div className="hero-grid-bg" />
@@ -597,7 +507,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ──────────────────────────────────── */}
       <section className="section-how">
         <div className="section-inner">
           <div className="section-label reveal">Process</div>
@@ -616,7 +525,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FEATURES ──────────────────────────────────────── */}
       <section className="section-features">
         <div className="section-inner">
           <div className="section-label reveal">Features</div>
@@ -641,7 +549,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────── */}
       <section className="section-cta">
         <div className="cta-inner">
           <div className="cta-board-bg" aria-hidden="true">
