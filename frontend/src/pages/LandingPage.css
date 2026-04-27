@@ -186,7 +186,7 @@
   height: clamp(500px, 70vh, 300px);
   display: block;
   cursor: grab;
-  background: #0a0806;
+  background: #151313;
 }
 .three-scene:active { cursor: grabbing; }
 
