@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import './LandingPage.css'
 
 function useSectionReveal() {
@@ -165,7 +166,12 @@ function ChessScene3D() {
       scene.add(boardGroup)
       sceneRef.current = { boardGroup, fillLight, rimLight }
 
+      const dracoLoader = new DRACOLoader()
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/')
+
+
       const loader = new GLTFLoader()
+      loader.setDRACOLoader(dracoLoader)
       loader.load(
       '/models/chess_set.glb',
       (gltf) => {
