@@ -3,6 +3,7 @@ import { useAuth }     from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import * as anime from 'animejs'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import './LandingPage.css'
@@ -48,6 +49,7 @@ function useAnimeText(selector, delay = 0) {
   useEffect(() => {
     let scriptEl
     const run = (anime) => {
+      // anime here is the callable function — no change needed inside run()
       document.querySelectorAll(selector).forEach(el => {
         if (el.dataset.animed) return
         el.dataset.animed = '1'
@@ -60,19 +62,26 @@ function useAnimeText(selector, delay = 0) {
           .join('')
         anime({
           targets: el.querySelectorAll('.anime-char'),
-          opacity:   [0, 1],
-          translateY:[14, 0],
-          duration:  480,
-          delay:     anime.stagger(38, { start: delay }),
-          easing:    'easeOutExpo',
+          opacity:    [0, 1],
+          translateY: [14, 0],
+          duration:   480,
+          delay:      anime.stagger(38, { start: delay }),
+          easing:     'easeOutExpo',
         })
       })
     }
-
-    if (window.anime) { run(window.anime); return }
+    const getAnime = () => {
+      const a = window.anime
+      return typeof a === 'function' ? a : a?.default ?? null
+    }
+    const existing = getAnime()
+    if (existing) { run(existing); return }
     scriptEl = document.createElement('script')
     scriptEl.src = 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js'
-    scriptEl.onload = () => run(window.anime)
+    scriptEl.onload = () => {
+      const a = getAnime()
+      if (a) run(a)
+    }
     document.head.appendChild(scriptEl)
     return () => { scriptEl?.remove() }
   }, [selector, delay])
@@ -80,9 +89,14 @@ function useAnimeText(selector, delay = 0) {
 
 function useAnimeOnReveal(selector) {
   useEffect(() => {
+    const getAnime = () => {
+      const a = window.anime
+      return typeof a === 'function' ? a : a?.default ?? null
+    }
     const obs = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (!entry.isIntersecting || !window.anime) return
+        const anime = getAnime()
+        if (!entry.isIntersecting || !anime) return
         const el = entry.target
         if (el.dataset.animed) return
         el.dataset.animed = '1'
@@ -93,13 +107,13 @@ function useAnimeOnReveal(selector) {
             ? '<span class="anime-char" style="display:inline-block;">&nbsp;</span>'
             : `<span class="anime-char" style="display:inline-block;opacity:0;transform:translateY(10px)">${ch}</span>`)
           .join('')
-        window.anime({
+        anime({
           targets: el.querySelectorAll('.anime-char'),
-          opacity:   [0, 1],
-          translateY:[10, 0],
-          duration:  420,
-          delay:     window.anime.stagger(30),
-          easing:    'easeOutExpo',
+          opacity:    [0, 1],
+          translateY: [10, 0],
+          duration:   420,
+          delay:      anime.stagger(30),
+          easing:     'easeOutExpo',
         })
       })
     }, { threshold: 0.5 })

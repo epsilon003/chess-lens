@@ -1,6 +1,12 @@
 // backend/routes/analyze.js
 const express  = require('express')
 const multer   = require('multer')
+const MAGIC = {
+  jpeg: [0xFF, 0xD8, 0xFF],
+  png:  [0x89, 0x50, 0x4E, 0x47],
+  gif:  [0x47, 0x49, 0x46, 0x38],
+  webp: [0x52, 0x49, 0x46, 0x46],  // RIFF____WEBP
+}
 const axios    = require('axios')
 const FormData = require('form-data')
 const router   = express.Router()
@@ -15,12 +21,25 @@ const upload = multer({
   },
 })
 
-// ── POST /api/analyze-image ───────────────────────────────────
-// Receives an image, forwards to the Python vision service,
+function hasValidMagic(buffer) {
+  const b = buffer
+  return (
+    (b[0]===0xFF && b[1]===0xD8 && b[2]===0xFF)           ||  // JPEG
+    (b[0]===0x89 && b[1]===0x50 && b[2]===0x4E && b[3]===0x47) ||  // PNG
+    (b[0]===0x47 && b[1]===0x49 && b[2]===0x46 && b[3]===0x38) ||  // GIF
+    (b[0]===0x52 && b[1]===0x49 && b[2]===0x46 && b[3]===0x46 &&    // WebP
+     b[8]===0x57 && b[9]===0x45 && b[10]===0x42 && b[11]===0x50)
+  )
+}
+
+// POST /api/analyze-image 
 // returns { fen, confidence }
 router.post('/analyze-image', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image uploaded' })
+  }
+  if (!hasValidMagic(req.file.buffer)) {
+    return res.status(400).json({ error: 'Invalid image format' })
   }
 
   try {

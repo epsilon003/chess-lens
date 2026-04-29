@@ -2,9 +2,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url)
 
+    if (!env.ALLOWED_ORIGIN) {
+      return new Response('Server misconfigured: ALLOWED_ORIGIN not set', { status: 500 })
+    }
     // CORS headers
     const corsHeaders = {
-      'Access-Control-Allow-Origin':  env.ALLOWED_ORIGIN || '*',
+      'Access-Control-Allow-Origin':  env.ALLOWED_ORIGIN,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     }

@@ -3,6 +3,10 @@
 const CLOUD_NAME   = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 
+if (!CLOUD_NAME || !UPLOAD_PRESET) {
+  throw new Error('Missing Cloudinary env vars')
+}
+
 export async function uploadBoardPhoto(uid, gameId, imageBlob) {
   const formData = new FormData()
   formData.append('file',           imageBlob)

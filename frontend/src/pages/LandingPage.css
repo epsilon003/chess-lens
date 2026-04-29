@@ -177,10 +177,7 @@
   opacity: 0;
   animation: fadeSlideUp 0.8s 0.35s cubic-bezier(0.22,1,0.36,1) forwards;
 }
-.hero-3d-card {
-  border-radius: 12px;
-  overflow: hidden;
-}
+
 .three-scene {
   width: 100%;
   height: clamp(500px, 70vh, 300px);

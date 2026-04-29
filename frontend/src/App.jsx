@@ -1,13 +1,14 @@
 // src/App.jsx
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './hooks/useAuth'
-import Navbar        from './components/Navbar'
-import LandingPage   from './pages/LandingPage'
-import AuthPage      from './pages/AuthPage'
-import AnalyzePage   from './pages/AnalyzePage'
-import GamesPage     from './pages/GamesPage'
-import GameDetail    from './pages/GameDetail'
-import PatternsPage  from './pages/PatternsPage'
+import Navbar from './components/Navbar'
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const AuthPage = lazy(() => import('./pages/AuthPage'))
+const AnalyzePage = lazy(() => import('./pages/AnalyzePage'))
+const GamesPage = lazy(() => import('./pages/GamesPage'))
+const GameDetail = lazy(() => import('./pages/GameDetail'))
+const PatternsPage = lazy(() => import('./pages/PatternsPage'))
 import './index.css'
 
 function ProtectedRoute({ children }) {
