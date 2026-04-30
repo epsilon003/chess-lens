@@ -10,6 +10,7 @@ const MAGIC = {
 const axios    = require('axios')
 const FormData = require('form-data')
 const router   = express.Router()
+const requireAuth = require('../middleware/requireAuth')
 
 // Store image in memory (no disk writes needed)
 const upload = multer({
@@ -34,7 +35,7 @@ function hasValidMagic(buffer) {
 
 // POST /api/analyze-image 
 // returns { fen, confidence }
-router.post('/analyze-image', upload.single('image'), async (req, res) => {
+router.post('/analyze-image', requireAuth, upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No image uploaded' })
   }
