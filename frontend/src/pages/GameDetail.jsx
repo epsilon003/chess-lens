@@ -1,5 +1,5 @@
 // src/pages/GameDetail.jsx
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Chessboard }  from 'react-chessboard'
 import { Chess }       from 'chess.js'
@@ -17,40 +17,55 @@ export default function GameDetail() {
 
   const [game,    setGame]    = useState(null)
   const [loading, setLoading] = useState(true)
-  const [chess]               = useState(() => new Chess())
   const [fen,     setFen]     = useState('')
   const [moveIdx, setMoveIdx] = useState(-1)
   const [history, setHistory] = useState([])
+
+  // Store the raw verbose history from the loaded PGN, never mutated
+  const pgnHistoryRef = useRef([])
 
   useEffect(() => {
     loadGame(user.uid, id)
       .then((g) => {
         setGame(g)
-        // Replay from PGN if available, else just load the saved FEN
+        const chess = new Chess()
         if (g.pgn) {
           chess.loadPgn(g.pgn)
         } else {
           chess.load(g.fen)
         }
         const h = chess.history({ verbose: true })
+        pgnHistoryRef.current = h
         setHistory(h)
-        // Start at beginning (before move 1)
-        chess.reset()
-        setFen(chess.fen())
+        // Start at beginning
+        const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        setFen(startFen)
         setMoveIdx(-1)
-        sf.analyse(chess.fen())
+        sf.analyse(startFen)
       })
       .catch(() => navigate('/games'))
       .finally(() => setLoading(false))
   }, [id, user.uid])
 
   const goToMove = (idx) => {
-    chess.reset()
-    history.slice(0, idx + 1).forEach((m) => chess.move(m.san))
-    const newFen = chess.fen()
+    // Always replay from scratch using the frozen PGN history
+    const temp = new Chess()
+    const moves = pgnHistoryRef.current
+    for (let i = 0; i <= idx; i++) {
+      const m = moves[i]
+      temp.move(m.san)  // SAN is unambiguous when replayed in order from start
+    }
+    const newFen = temp.fen()
     setFen(newFen)
     setMoveIdx(idx)
     sf.analyse(newFen)
+  }
+
+  const goToStart = () => {
+    const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    setFen(startFen)
+    setMoveIdx(-1)
+    sf.analyse(startFen)
   }
 
   const handleDelete = async () => {
@@ -64,7 +79,6 @@ export default function GameDetail() {
 
   return (
     <div className="page game-detail">
-      {/* Breadcrumb */}
       <nav className="breadcrumb">
         <Link to="/games" className="breadcrumb-link">← My Games</Link>
         <span className="breadcrumb-sep">/</span>
@@ -94,16 +108,15 @@ export default function GameDetail() {
             />
           </div>
 
-          {/* Move navigation */}
           {history.length > 0 && (
             <div className="move-nav">
               <button
                 className="nav-btn" disabled={moveIdx < 0}
-                onClick={() => { chess.reset(); setFen(chess.fen()); setMoveIdx(-1); sf.analyse(chess.fen()) }}
+                onClick={goToStart}
               >|◀</button>
               <button
                 className="nav-btn" disabled={moveIdx < 0}
-                onClick={() => goToMove(moveIdx - 1 >= 0 ? moveIdx - 1 : -1)}
+                onClick={() => moveIdx - 1 >= 0 ? goToMove(moveIdx - 1) : goToStart()}
               >◀</button>
               <span className="move-counter">
                 {moveIdx >= 0 ? `Move ${moveIdx + 1}/${history.length}` : 'Start'}
@@ -131,7 +144,6 @@ export default function GameDetail() {
             ready={sf.ready}
           />
 
-          {/* Full move list */}
           {history.length > 0 && (
             <div className="card mt-16">
               <p className="card-title">Moves</p>
