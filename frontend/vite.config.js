@@ -9,12 +9,15 @@ export default defineConfig({
     exclude: [],
   },
   optimizeDeps: {
-    // No longer need to exclude stockfish — we load it via CDN in the worker
     esbuildOptions: {
       loader: { '.js': 'jsx' },
     },
   },
   server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+      'Cross-Origin-Embedder-Policy': 'unsafe-none',  // prevents COEP from breaking popups
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
@@ -23,6 +26,6 @@ export default defineConfig({
     },
   },
   worker: {
-    format: 'iife',  // classic workers support importScripts(); 'es' does not
+    format: 'iife',
   },
 })
