@@ -40,7 +40,8 @@ export function useStockfish() {
 
   useEffect(() => {
     const worker = new Worker(
-      new URL('../workers/stockfish.worker.js', import.meta.url)
+      new URL('../workers/stockfish.worker.js', import.meta.url),
+      { type: 'classic' }
     )
 
     worker.onmessage = (e) => {
