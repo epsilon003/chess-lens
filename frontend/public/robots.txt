@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /auth
+
+# Keep private app pages out of search results
+Disallow: /analyze
+Disallow: /games
+Disallow: /patterns
+
+Sitemap: https://chess-lens.pages.dev/sitemap.xml

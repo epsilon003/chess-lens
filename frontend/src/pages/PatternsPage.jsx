@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useAuth }             from '../hooks/useAuth'
 import { loadGames }           from '../services/gamesService'
 import { analysePatterns }     from '../services/patternRecognition'
+import { SEO } from '../hooks/useSEO'
 import './PatternsPage.css'
 
 const SEVERITY_CONFIG = {
@@ -97,6 +98,12 @@ export default function PatternsPage() {
 
   return (
     <div className="page patterns-page">
+      <SEO
+        title="Pattern Analysis"
+        description="Discover your chess weaknesses and strengths across all saved games."
+        canonical="/patterns"
+        noindex={true}
+      />
       <div className="patterns-header">
         <div>
           <h1 className="page-title">Pattern Analysis</h1>

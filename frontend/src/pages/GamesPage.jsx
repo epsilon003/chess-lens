@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link }          from 'react-router-dom'
 import { useAuth }       from '../hooks/useAuth'
 import { loadGames, deleteGame } from '../services/gamesService'
+import { SEO } from '../hooks/useSEO'
 import './GamesPage.css'
 
 export default function GamesPage() {
@@ -34,6 +35,12 @@ export default function GamesPage() {
 
   return (
     <div className="page games-page">
+      <SEO
+        title="My Games"
+        description="Your saved chess games and analysis history."
+        canonical="/games"
+        noindex={true}
+      />
       <div className="games-header">
         <h1 className="page-title">My Games</h1>
         <Link to="/analyze" className="btn btn-primary">

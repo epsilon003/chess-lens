@@ -13,9 +13,11 @@ import PgnImportModal       from '../components/PgnImportModal'
 import EvalGraph            from '../components/EvalGraph'
 import { saveGame }         from '../services/gamesService'
 import { uploadBoardPhoto } from '../services/photoStorage'
+import { SEO } from '../hooks/useSEO'
 import './AnalyzePage.css'
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+const OG_WORKER = 'https://og.chess-lens.pages.dev'
 
 export default function AnalyzePage() {
   const { user }         = useAuth()
@@ -279,9 +281,17 @@ export default function AnalyzePage() {
     if (idx < treeNodes.length) navigateTo(idx)
   }
 
+  const ogImage = `${OG_WORKER}?fen=${encodeURIComponent(fen)}&title=${encodeURIComponent(opening?.name || 'Chess Position')}`
+
   return (
     <div className="analyze-page page">
-
+      <SEO
+        title={opening ? `Analyzing ${opening.name} (${opening.eco})` : 'Analyze Position'}
+        description="Analyze any chess position with Stockfish at depth 18. Get best moves, evaluation graph, and move quality grades."
+        canonical="/analyze"
+        ogImage={ogImage}
+        noindex={true}
+      />
       {/* Header */}
       <div className="analyze-header">
         <div>
