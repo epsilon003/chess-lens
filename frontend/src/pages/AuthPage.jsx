@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { SEO } from '../hooks/useSEO'
 import './AuthPage.css'
 
 export default function AuthPage() {
@@ -44,6 +45,12 @@ export default function AuthPage() {
 
   return (
     <div className="auth-page">
+      <SEO
+        title="Sign In"
+        description="Sign in to ChessLens to save games and access pattern analysis."
+        canonical="/auth"
+        noindex={true}
+      />
       <div className="auth-card">
 
         {/* Logo */}

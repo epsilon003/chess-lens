@@ -8,3 +8,4 @@ __pycache__/
 archive/
 vision-service/venv/
 .env.example
+.wrangler/

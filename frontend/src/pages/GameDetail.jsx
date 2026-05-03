@@ -7,6 +7,7 @@ import { useAuth }     from '../hooks/useAuth'
 import { useStockfish } from '../hooks/useStockfish'
 import { loadGame, deleteGame } from '../services/gamesService'
 import AnalysisPanel   from '../components/AnalysisPanel'
+import { SEO } from '../hooks/useSEO'
 import './GameDetail.css'
 
 export default function GameDetail() {
@@ -79,6 +80,12 @@ export default function GameDetail() {
 
   return (
     <div className="page game-detail">
+      <SEO
+        title={game ? `${game.title} — ${game.white || '?'} vs ${game.black || '?'}` : 'Game Detail'}
+        description={game?.notes || 'Review this saved chess game with Stockfish analysis.'}
+        canonical={`/games/${id}`}
+        noindex={true}
+      />
       <nav className="breadcrumb">
         <Link to="/games" className="breadcrumb-link">← My Games</Link>
         <span className="breadcrumb-sep">/</span>

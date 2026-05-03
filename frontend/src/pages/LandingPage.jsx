@@ -6,7 +6,26 @@ import * as THREE from 'three'
 import * as anime from 'animejs'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+import { SEO } from '../hooks/useSEO'
 import './LandingPage.css'
+
+const SOFTWARE_APP_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ChessLens",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+  "description": "AI-powered chess analysis. Upload board photos, get Stockfish engine analysis, save and review your games.",
+  "url": "https://chess-lens.pages.dev",
+  "featureList": [
+    "Board photo recognition",
+    "Stockfish depth-18 analysis",
+    "Opening detection (80+ ECO codes)",
+    "Game library with PGN import",
+    "Pattern recognition across saved games",
+  ],
+}
 
 function useSectionReveal() {
   useEffect(() => {
@@ -460,7 +479,12 @@ export default function LandingPage() {
 
   return (
     <div className="landing-v2">
-
+      <SEO
+      title="AI Chess Analysis — See Beyond the Board"
+        description="Upload any chess board photo for instant Stockfish analysis. Detect openings, classify moves, save games, and uncover your patterns. Free, browser-native."
+        canonical="/"
+        jsonLd={SOFTWARE_APP_SCHEMA}
+      />
       <section className="hero-v2">
         <div className="hero-parallax-bg" aria-hidden="true">
           <div className="hero-grid-bg" />
