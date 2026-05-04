@@ -17,7 +17,7 @@ import { SEO } from '../hooks/useSEO'
 import './AnalyzePage.css'
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-const OG_WORKER = 'https://og.chess-lens.pages.dev'
+const OG_WORKER = 'https://chess-lens-og.abhimantrsingh.workers.dev'
 
 export default function AnalyzePage() {
   const { user }         = useAuth()
